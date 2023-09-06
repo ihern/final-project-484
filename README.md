@@ -1,34 +1,36 @@
-# Your final project name goes here
-
 # Isaias Hernandez - iherna50
+
 # Roman Moreno - rmoren21
 
-# Your GitHub repository link goes here
+# https://github.com/ihern/final-project-484
+
 If you have a private repository, please add `kaytwo` and `sauravjoshi` as collaborators.
 
 ## What does your application do?
+
 We will be creating a speed dating web application.
 The purpose of this app is to aid speed dating events. This application will provide users a more personalized experience that makes them eager to find out who they matched with during speed dating events, and also encourages them to keep coming to events.
 There will be two modes, an admin and a user mode.
-Users will need to register through our website using their: name, email, password, age, sex, and phone number.
+In order for users to access our services they will need to register through our website using their: name, email, password, age, sex, and phone number.
 Users then need to pick from the available event dates.
+At the events users will be able to check in and access a feature that lets them pick people they had a connection with.
+After events, users need to wait 24 hrs to get their matches. Matches will be listed on their dashboard and they will be able to see people contact information to set up second dates on their own.
 Admin will have the ability to create post new events on the site.
 
-
 ## What makes it different than a CRUD app? I.e., what functionality does it provide that is not just a user interface layer on top of a database of user information,and the ability to view / add to / change that information?
-Through our webside users will be able to edit their registration information, delete their accounts, add people they want a second date with, and view date matches.
+
+Through our webside users will be able to edit their registration information, delete their accounts, add people they want a second date with, and view date matches/delete date matches.
 The admin will be able to view everyones information from the registration questionaire, remove people from the database, and see the number of matches per event.
+The admin will be able to edit the speed dating event capacity to accomodate for demand.
 
 ## What security and privacy concerns do you expect you (as developers) or your users to have with this application?
+
 Some security and privacy concerns that we have for our users is being able to limit the amount of information they can know about each other. Our application will heavily rely on keeping things short and private between users. So being able to
 ensure that each user's data will be secured and stored is our number one priority. Another concern we have is for the admin role, though they may have special permissions, apart from regular users, the role should not have more information than
 what is needed in order to fulfill the role. In other words, we want to make sure they know enough to make the speed dating process as smooth as possible, but not enough to ruin the integrity of the app's purpose.
-
 
 ### This repository
 
 This repository has a package.json that functions as a blank shell that gets full credit if you turn it in to the gradescope autograder. We will not be using the autograder in any way to actually evaluate your project, it is just there to keep track of your initial submission.
 
 We recommend that you use this repository for your final project code. This will allow you to ask questions on Piazza and get help from the TAs and instructors. Adding a real linter, type checker, etc, based on our other examples would be a good idea.
-
-

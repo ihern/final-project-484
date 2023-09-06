@@ -20,7 +20,9 @@ Through our webside users will be able to edit their registration information, d
 The admin will be able to view everyones information from the registration questionaire, remove people from the database, and see the number of matches per event.
 
 ## What security and privacy concerns do you expect you (as developers) or your users to have with this application?
-
+Some security and privacy concerns that we have for our users is being able to limit the amount of information they can know about each other. Our application will heavily rely on keeping things short and private between users. So being able to
+ensure that each user's data will be secured and stored is our number one priority. Another concern we have is for the admin role, though they may have special permissions, apart from regular users, the role should not have more information than
+what is needed in order to fulfill the role. In other words, we want to make sure they know enough to make the speed dating process as smooth as possible, but not enough to ruin the integrity of the app's purpose.
 
 
 ### This repository

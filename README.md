@@ -8,14 +8,25 @@ If you have a private repository, please add `kaytwo` and `sauravjoshi` as colla
 
 ## What does your application do?
 
-We will be creating a speed dating web application.
-The purpose of this app is to aid speed dating events. This application will provide users a more personalized experience that makes them eager to find out who they matched with during speed dating events, and also encourages them to keep coming to events.
+We will be creating a speed dating web application with the purpose of aiding speed dating events.
+This application will provide users a more personalized experience that makes them eager to find out who they matched with during speed dating events, and also encourages them to keep coming to events.
 There will be two modes, an admin and a user mode.
-In order for users to access our services they will need to register through our website using their: name, email, password, age, sex, and phone number.
-Users then need to pick from the available event dates.
-At the events users will be able to check in and access a feature that lets them pick people they had a connection with.
-After events, users need to wait 24 hrs to get their matches. Matches will be listed on their dashboard and they will be able to see people contact information to set up second dates on their own.
-Admin will have the ability to create post new events on the site.
+
+### Admin
+
+- Creates new speed dating events
+- View user matches and total event matches
+- View feedback on event
+- Ban users
+
+### Users:
+
+- Need to register through our website
+- Fill out questionaire that gives more information their interest
+- Register for speed dating events
+- Check in to event at arrival
+- Select people they would like to go on a second date with
+- Will see matches 24 hrs after speed dating event on their dashboard
 
 ## What makes it different than a CRUD app? I.e., what functionality does it provide that is not just a user interface layer on top of a database of user information,and the ability to view / add to / change that information?
 

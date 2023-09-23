@@ -12,11 +12,12 @@ We will be creating a speed dating web application with the purpose of aiding sp
 This application will provide users a more personalized experience that makes them eager to find out who they matched with during speed dating events, and also encourages them to keep coming to events.
 There will be two modes, an admin and a user mode.
 
-### Admin
+### Admin:
 
 - Creates new speed dating events
 - View user matches and total event matches
 - View feedback on event
+- Send email reminders to people about event date proximity
 - Ban users
 
 ### Users:
@@ -33,9 +34,8 @@ There will be two modes, an admin and a user mode.
 
 ## What makes it different than a CRUD app? I.e., what functionality does it provide that is not just a user interface layer on top of a database of user information,and the ability to view / add to / change that information?
 
-Through our webside users will be able to edit their registration information, delete their accounts, add people they want a second date with, and view date matches/delete date matches.
-The admin will be able to view everyones information from the registration questionaire, remove people from the database, and see the number of matches per event.
-The admin will be able to edit the speed dating event capacity to accomodate for demand.
+Our website will take a user's information from the sign up questionare. Using this it will generate unique questions that invoke good conversations personalized to the pair sitting at the same table during speed dating event.
+The app will also generate second date ideas based on interests. These ideas will be attach to user match notifications.
 
 ## What security and privacy concerns do you expect you (as developers) or your users to have with this application?
 

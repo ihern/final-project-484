@@ -8,9 +8,15 @@ If you have a private repository, please add `kaytwo` and `sauravjoshi` as colla
 
 ## ExcaliDraw 
 https://excalidraw.com/#json=8PE0U9KuKveDcR-_TCkfI,y0evdrK57JE8g_eJkwchBA 
-## Disclaimer : 
+### Disclaimer : 
 We tried deploying our website on render and netlify but they just would stop deploying after succesfull builds. 
 When we run npm run dev our local app does work. We tried deploying using start command: ```npm run build```
+## MVP:
+For checkpoint 2, we plan to have our secure login page fully incorporated, which 
+will be achieved with Google's sign-in authentication. As well as a fully implemented
+UI using bootstrap to allow for an attractive look. We also plan to have 2 roles
+created, 'User' and 'Admin' that will have their own permission levels for our web 
+application.
 
 ## What does your application do?
 

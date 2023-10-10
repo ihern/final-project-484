@@ -2,19 +2,22 @@
 
 # Roman Moreno - rmoren21
 
-# https://github.com/ihern/final-project-484
+## https://github.com/ihern/final-project-484
 
-If you have a private repository, please add `kaytwo` and `sauravjoshi` as collaborators.
+## ExcaliDraw
 
-## ExcaliDraw 
-https://excalidraw.com/#json=8PE0U9KuKveDcR-_TCkfI,y0evdrK57JE8g_eJkwchBA 
-### Live Site : 
+https://excalidraw.com/#json=8PE0U9KuKveDcR-_TCkfI,y0evdrK57JE8g_eJkwchBA
+
+### Live Site :
+
 https://super-flan-07f2d0.netlify.app/
+
 ## MVP:
-For checkpoint 2, we plan to have our secure login page fully incorporated, which 
+
+For checkpoint 2, we plan to have our secure login page fully incorporated, which
 will be achieved with Google's sign-in authentication. As well as a fully implemented
 UI using bootstrap to allow for an attractive look. We also plan to have 2 roles
-created, 'User' and 'Admin' that will have their own permission levels for our web 
+created, 'User' and 'Admin' that will have their own permission levels for our web
 application.
 
 ## What does your application do?
@@ -52,37 +55,3 @@ The app will also generate second date ideas based on interests. These ideas wil
 Some security and privacy concerns that we have for our users is being able to limit the amount of information they can know about each other. Our application will heavily rely on keeping things short and private between users. So being able to
 ensure that each user's data will be secured and stored is our number one priority. Another concern we have is for the admin role, though they may have special permissions, apart from regular users, the role should not have more information than
 what is needed in order to fulfill the role. In other words, we want to make sure they know enough to make the speed dating process as smooth as possible, but not enough to ruin the integrity of the app's purpose.
-
-### This repository
-
-This repository has a package.json that functions as a blank shell that gets full credit if you turn it in to the gradescope autograder. We will not be using the autograder in any way to actually evaluate your project, it is just there to keep track of your initial submission.
-
-We recommend that you use this repository for your final project code. This will allow you to ask questions on Piazza and get help from the TAs and instructors. Adding a real linter, type checker, etc, based on our other examples would be a good idea.
-
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

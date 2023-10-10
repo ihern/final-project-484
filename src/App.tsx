@@ -1,6 +1,4 @@
-
-
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
@@ -21,3 +19,4 @@ function App() {
 }
 
 export default App
+;

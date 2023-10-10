@@ -1,5 +1,6 @@
 // import React, { useState } from 'react';
-import React from 'react';
+// import React from 'react';
+import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyle.css';
 
@@ -29,6 +30,13 @@ const LoginForm = () => {
                 <button type="submit" className="btn btn-success m-2">Create new account</button>
             </div>
         </form>
+
+       
+        <footer className="mt-auto">
+            <button>
+                <Link to="/mvp">Checkpoint 1 MVP</Link>
+            </button>
+        </footer>
     </div>
   );
 };

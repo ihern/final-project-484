@@ -3,9 +3,9 @@
 import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyle.css';
+// import { supabase } from './lib/supabaseClient';
 
 const LoginForm = () => {
-
   return (
     <div className='bg-secondary-subtle d-flex justify-content-center align-items-center' style={{height: '100vh'}}>
         
@@ -27,7 +27,7 @@ const LoginForm = () => {
             <div className='d-flex flex-column'>
                 <button type="submit" className="btn btn-primary m-2">Login</button>
                 <hr className="hr hr-blurry" />
-                <button type="submit" className="btn btn-success m-2">Create new account</button>
+                <a href="/signup" className="btn btn-success m-2">Create new account</a>
             </div>
         </form>
 

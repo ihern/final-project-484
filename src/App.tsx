@@ -3,9 +3,9 @@ import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
 import PersonalSurvey from './components/PersonalSurvey';
+// import supabase from 'supabase';
 
 function App() {
-  // const [count, setCount] = useState(0)
 
   return (
     <>

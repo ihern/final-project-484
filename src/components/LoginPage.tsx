@@ -3,7 +3,6 @@
 import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyle.css';
-// import { supabase } from './lib/supabaseClient';
 
 const LoginForm = () => {
   return (

@@ -13,7 +13,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
+    "paths": {
+      "@/supabase": ["./src/services/supabase.ts"],
+    },
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

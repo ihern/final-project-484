@@ -1,14 +1,14 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
 const LandingPage = () => {
+      
     const navigate = useNavigate();
   
     const handleLogout = async () => {
       const { error } = await supabase.auth.signOut();
       if (!error) {
-        navigate('/');
+        navigate('/', { replace: true });
       }
     };
 

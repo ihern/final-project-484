@@ -5,6 +5,7 @@ import './styles/loginStyle.css';
 import { supabase } from "@/supabase";
 
 const LoginForm = () => {
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -13,7 +14,7 @@ const LoginForm = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({    // should most likely be let not const
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });

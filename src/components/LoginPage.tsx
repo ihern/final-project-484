@@ -11,6 +11,26 @@ const LoginForm = () => {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
+    const handleGoogleSignIn = async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              queryParams: {
+                access_type: 'offline',
+                prompt: 'consent',
+              },
+            },
+          });
+
+          if(!error) {
+                console.log('Login successful: ', data);
+                navigate('/landing');
+          } else {
+                setError('Login failed. Please check your email and password.');
+                console.error('Login failed: ', error);
+          }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
@@ -36,7 +56,11 @@ const LoginForm = () => {
         <div className='p-5'>
             <h1 className='logoFont'>Media Naranja Speed Dating</h1>
             <h3>A refreshing way of meeting people</h3>
+            <button onClick={handleGoogleSignIn} className="btn btn-primary m-2 align-items-center">Sign in with Google</button>
         </div>
+
+
+
         <form className='bg-light p-2 shadow rounded-2' onSubmit={handleSubmit}>
             <div className="input-group mb-3">
                 <span className="input-group-text" id="basic-addon1">Email</span>

@@ -4,7 +4,7 @@ import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
 import PersonalSurvey from './components/PersonalSurvey';
-import { supabase } from './services/supabase';
+// import { supabase } from './services/supabase';
 
 function App() {
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/loginStyle.css';
-import { supabase } from "@/supabase";
+import { supabase } from "../services/supabase";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');

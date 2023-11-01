@@ -42,7 +42,6 @@ There will be two modes, an admin and a user mode.
 - Check in to event at arrival
 - At the event, people will scan QR code on table for our algorithm to generate interesting conversation starting questions based on the two peoples interest
 - Select people they would like to go on a second date with and why
-- Will see matches 24 hrs after speed dating event on their dashboard
 - Matches will come with ideas for second dates based on user interest
 
 ## What makes it different than a CRUD app? I.e., what functionality does it provide that is not just a user interface layer on top of a database of user information,and the ability to view / add to / change that information?

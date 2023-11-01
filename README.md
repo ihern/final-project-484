@@ -1,3 +1,8 @@
+## Final Checkpoint checkpoint 2:
+Our app currently implements a fully functional login page, as well as a signup page. The created user is then added to our database (supabase).
+All routes in our web app are protected and require user authentication in order to make it to the landing page. We have also implemented the option for users to login
+through Google. Our web app also features a welcoming UI that was done with bootstrap.
+
 # Isaias Hernandez - iherna50
 
 # Roman Moreno - rmoren21

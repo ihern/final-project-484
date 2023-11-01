@@ -1,9 +1,10 @@
 // import React from 'react';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
+// import { useEffect, useState } from "react";
 import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
 import PersonalSurvey from './components/PersonalSurvey';
-// import supabase from 'supabase';
+// import supabase from './services/supabase.js';
 
 function App() {
 

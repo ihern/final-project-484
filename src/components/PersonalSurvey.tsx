@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-// import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { supabase } from '@/supabase'
 
 
 const PersonalSurvey = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         console.log('handleSubmit called');
@@ -16,10 +18,12 @@ const PersonalSurvey = () => {
                 email: email,
                 password: password,
              });
-            if(error) { // didnt signup successfully
-                console.log('Sign in failed: ', error);
+            if(error) { // didnt sign up successfully
+                setError('Sign up failed. Please check your email and password.');
+                console.log('Sign up failed: ', error);
             } else {    // signed up successfully
-                console.log('Sign in successful: ', data);
+                navigate('/');
+                console.log('Sign up successful: ', data);
             }
         } catch (error) {
             console.log(error);
@@ -124,11 +128,15 @@ const PersonalSurvey = () => {
 
                             <hr />
 
+                            {error && (
+                                <div className="alert alert-danger">{error}</div>
+                            )}
+
                             <footer className="text-end">
                                 <button type="submit" className="btn btn-primary">
                                     Submit
                                 </button>
-                            </footer>P
+                            </footer>
                         </form>
                     </div>
                 </div>

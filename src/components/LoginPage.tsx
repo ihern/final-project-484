@@ -15,12 +15,9 @@ const LoginForm = () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-              queryParams: {
-                access_type: 'offline',
-                prompt: 'consent',
+                redirectTo: `${location.origin}/landing`,
               },
-            },
-          });
+          })
 
           if(!error) {
                 console.log('Login successful: ', data);

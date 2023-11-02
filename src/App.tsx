@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, HashRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <>
-      <HashRouter>
+      <BrowserRouter>
         <Routes>
           <Route
             path="/"
@@ -37,7 +37,7 @@ function App() {
             element={<PersonalSurvey />} 
           />
         </Routes>
-      </HashRouter>
+      </BrowserRouter>
     </>
   );
 }

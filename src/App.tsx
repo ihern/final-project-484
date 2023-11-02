@@ -5,7 +5,6 @@ import LoginPage from './components/LoginPage';
 import MVP from './components/MVP';
 import PersonalSurvey from './components/PersonalSurvey';
 import { supabase } from './services/supabase';
-// import { User } from '@supabase/supabase-js';
 
 function App() {
 
@@ -21,7 +20,7 @@ function App() {
     <>
       <HashRouter>
         <Routes>
-        <Route
+          <Route
             path="/"
             element={<LoginPage />}
           />
@@ -29,8 +28,14 @@ function App() {
             path="/landing"
             element={<LandingPage />}
           />
-          <Route path="/mvp" element={<MVP />} />
-          <Route path="/signup" element={<PersonalSurvey />} />
+          <Route
+            path="/mvp" 
+            element={<MVP />} 
+          />
+          <Route 
+            path="/signup" 
+            element={<PersonalSurvey />} 
+          />
         </Routes>
       </HashRouter>
     </>

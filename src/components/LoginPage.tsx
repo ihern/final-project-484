@@ -21,7 +21,6 @@ const LoginForm = () => {
 
           if(!error) {
                 console.log('Login successful: ', data);
-                navigate('/landing');
           } else {
                 setError('Login failed. Please check your email and password.');
                 console.error('Login failed: ', error);
@@ -89,7 +88,7 @@ const LoginForm = () => {
             <div className='d-flex flex-column'>
                 <button type="submit" className="btn btn-primary m-2">Login</button>
                 <hr className="hr hr-blurry" />
-                <a href="/signup" className="btn btn-success m-2">Create new account</a>
+                <Link to="/signup" className="btn btn-success m-2">Create new account</Link>
             </div>
         </form>
         <footer className="mt-auto">

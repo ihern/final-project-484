@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "homepage": "https://super-flan-07f2d0.netlify.app/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

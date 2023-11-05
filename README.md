@@ -1,4 +1,5 @@
 ## Final Checkpoint checkpoint 2:
+
 Our app currently implements a fully functional login page, as well as a signup page. The created user is then added to our database (supabase).
 All routes in our web app are protected and require user authentication in order to make it to the landing page. We have also implemented the option for users to login
 through Google. Our web app also features a welcoming UI that was done with bootstrap.
@@ -7,15 +8,11 @@ through Google. Our web app also features a welcoming UI that was done with boot
 
 # Roman Moreno - rmoren21
 
-## https://github.com/ihern/final-project-484
-
-## ExcaliDraw
-
-https://excalidraw.com/#json=8PE0U9KuKveDcR-_TCkfI,y0evdrK57JE8g_eJkwchBA
+### https://github.com/ihern/final-project-484
 
 ### Live Site :
 
-https://super-flan-07f2d0.netlify.app/
+https://strong-nasturtium-040bab.netlify.app/
 
 ## MVP:
 

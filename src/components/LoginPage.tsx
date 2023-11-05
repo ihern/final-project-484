@@ -15,10 +15,10 @@ const LoginForm = () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                queryParams: {
-                    prompt: 'consent',
-                    access_type: 'offline',
-                },
+                // queryParams: {
+                //     prompt: 'consent',
+                //     access_type: 'offline',
+                // },
                 redirectTo: `${location.origin}/landing`,
               },
           })

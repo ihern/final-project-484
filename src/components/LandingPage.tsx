@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-// import { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const LandingPage = () => {
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const user = supabase.auth.getUser();
-    //     if (!user) {
-    //       navigate('/', { replace: true });
-    //     }
-    // }, [navigate]);
+    useEffect(() => {
+        const user = supabase.auth.getUser();
+        if (!user) {
+          navigate('/', { replace: true });
+        }
+    }, [navigate]);
   
     const handleLogout = async () => {
       const { error } = await supabase.auth.signOut();

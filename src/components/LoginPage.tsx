@@ -15,7 +15,7 @@ const LoginForm = () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'https://strong-nasturtium-040bab.netlify.app/landing',
+                redirectTo: 'https://strong-nasturtium-040bab.netlify.app/landing/',
               },
           })
 

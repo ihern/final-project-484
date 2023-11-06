@@ -12,7 +12,7 @@ through Google. Our web app also features a welcoming UI that was done with boot
 
 ### Live Site :
 
-https://strong-nasturtium-040bab.netlify.app/
+https://super-flan-07f2d0.netlify.app/
 
 ## MVP:
 

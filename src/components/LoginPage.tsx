@@ -15,15 +15,12 @@ const LoginForm = () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                // queryParams: {
-                //     prompt: 'consent',
-                //     access_type: 'offline',
-                // },
-                redirectTo: `${location.origin}/landing`,
+                redirectTo: 'https://strong-nasturtium-040bab.netlify.app/landing',
               },
           })
 
           if(!error) {
+                console.log("HERE", location.origin)
                 console.log('Login successful: ', data);
           } else {
                 setError('Login failed. Please check your email and password.');

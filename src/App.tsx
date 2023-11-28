@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import LoginPage from './components/LoginPage';
+import ClientDashboard from './components/ClientDashboard';
+import Login from './components/Login';
 import MVP from './components/MVP';
-import PersonalSurvey from './components/PersonalSurvey';
+import Signup from './components/Signup';
+import AdminDashboard from './components/AdminDashboard';
 import { supabase } from './services/supabase';
 import { Session } from '@supabase/supabase-js';
 
 
-function App() {
+const App = () => {
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -32,11 +33,11 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<LoginPage />}
+            element={<Login />}
           />
           <Route
-            path="/landing"
-            element={isAuthenticated ? <LandingPage/> : <Navigate to ='/' />}
+            path="/client/dashboard"
+            element={isAuthenticated ? <ClientDashboard/> : <Navigate to ='/' />}
           />
           <Route
             path="/mvp" 
@@ -44,7 +45,11 @@ function App() {
           />
           <Route 
             path="/signup" 
-            element={<PersonalSurvey />} 
+            element={<Signup />} 
+          />
+          <Route 
+            path="/admin/dashboard" 
+            element={<AdminDashboard />}
           />
         </Routes>
       </BrowserRouter>

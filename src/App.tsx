@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ClientDashboard from './components/ClientDashboard';
+import ClientProfile from './components/ClientProfile';
 import Login from './components/Login';
 import MVP from './components/MVP';
 import Signup from './components/Signup';
@@ -38,6 +39,10 @@ const App = () => {
           <Route
             path="/client/dashboard"
             element={isAuthenticated ? <ClientDashboard/> : <Navigate to ='/' />}
+          />
+          <Route
+            path="/client/profile"
+            element={isAuthenticated ? <ClientProfile/> : <Navigate to ='/' />}
           />
           <Route
             path="/mvp" 

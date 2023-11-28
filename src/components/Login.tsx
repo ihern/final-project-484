@@ -4,18 +4,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/loginStyle.css';
 import { supabase } from "@/supabase";
 
-const LoginForm = () => {
+const Login = () => {
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
+    // got to fix all of this
     const handleGoogleSignIn = async () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/landing`,
+                redirectTo: `${window.location.origin}/`,
               },
           })
 
@@ -41,7 +42,7 @@ const LoginForm = () => {
                 console.log('Login failed: ', error);
             } else {    // logged in
                 console.log('Login successful: ', data);
-                navigate('/landing');
+                navigate('/client/dashboard');
             }
         } catch (error) {
             console.log(error);
@@ -101,4 +102,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default Login;

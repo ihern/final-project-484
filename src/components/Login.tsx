@@ -11,12 +11,11 @@ const Login = () => {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    // got to fix all of this
     const handleGoogleSignIn = async () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/`,
+                redirectTo: `${window.location.origin}/client/dashboard`,
               },
           })
 
@@ -32,7 +31,7 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data: user_data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
@@ -41,8 +40,23 @@ const Login = () => {
                 setError('Login failed. Please check your email and password.');
                 console.log('Login failed: ', error);
             } else {    // logged in
-                console.log('Login successful: ', data);
-                navigate('/client/dashboard');
+                console.log(user_data.user.id);
+                const { data, error } = await supabase
+                    .from('profile')
+                    .select('role')
+                    .eq('id', user_data.user.id);
+                if(error) {
+                    console.log('Error getting profile data: ', error);
+                }
+                else {
+                    console.log('queried data', data[0].role);
+                    if(data[0].role === 'client') {
+                        navigate('/client/dashboard');
+                    }
+                    else if(data[0].role === 'admin') {
+                        navigate('/admin/dashboard');
+                    }
+                }
             }
         } catch (error) {
             console.log(error);

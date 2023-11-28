@@ -43,33 +43,6 @@ const Signup = () => {
             } else {    // signed up successfully
                 console.log('Sign up successful:', data);
                 navigate('/')
-                // const userId = data?.user?.id; // Obtain the user's ID
-
-                // if (!userId) {
-                //     throw new Error('No user ID returned from Supabase');
-                // }
-
-                // try {
-                //     const { data, error } = await supabase
-                //         .from('profile')
-                //         .select('role')
-                //         .eq('id', userId)
-                //         .single()
-
-                //     if (error) {
-                //         console.log('error', error)
-                //     }
-
-                //     const user = data?.role;
-                //     console.log('Sign up successful');
-
-                //     if(user === 'admin') {
-                //         navigate('/admin');
-                //     } else { navigate('/client'); }
-
-                // } catch (error) {
-                //     console.log('error', error)
-                // }
             }
         } catch (error) {
             console.log(error);

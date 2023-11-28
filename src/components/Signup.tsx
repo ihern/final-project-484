@@ -42,7 +42,7 @@ const Signup = () => {
                 console.log('Sign up failed:', error);
             } else {    // signed up successfully
                 console.log('Sign up successful:', data);
-                navigate('/login')
+                navigate('/')
                 // const userId = data?.user?.id; // Obtain the user's ID
 
                 // if (!userId) {

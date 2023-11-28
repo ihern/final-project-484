@@ -11,10 +11,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/gotrue-js": "^2.57.0",
     "@supabase/supabase-js": "^2.38.4",
     "bootstrap": "^5.3.2",
     "dotenv": "^16.3.1",
+    "next": "^14.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0"

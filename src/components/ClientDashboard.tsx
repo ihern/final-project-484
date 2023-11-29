@@ -20,7 +20,6 @@ const ClientDashboard = () => {
         try {
             const { data, error } = await supabase.from('events').select('*');
             if (data) {
-                console.log('Fetching data', data);
                 setEvents(data);
             } else {
                 console.log('No data fectched:', error);
@@ -60,7 +59,6 @@ const ClientDashboard = () => {
     return (
         <div className="landing-page">
 
-
         {/* <!-- Navbar --> */}
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top bg-custom">
         <div className="container">
@@ -92,6 +90,7 @@ const ClientDashboard = () => {
             </div>
         </div>
         </nav>
+
         {/* <!-- Showcase --> */}
         <section
         className="bg-custom text-light p-5 p-lg-0 pt-lg-5 text-center text-sm-start "
@@ -125,8 +124,8 @@ const ClientDashboard = () => {
         <section className="p-5" id="schedule">
         <div className="container">
                 <h2 className='text-center mb-4'>Schedule</h2>
-                {events.map((event) => (
-                    <div className="row justify-content-center">
+                {events.map((event, idx) => (
+                    <div key= {idx} className="row justify-content-center">
                         <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3">
                             <div className="text-center text-white">
                                 <div className="title">
@@ -291,7 +290,7 @@ const ClientDashboard = () => {
         </section>
 
         {/* <!-- Footer --> */}
-        <footer className="p-5 bg-custom text-white text-center position-relative">
+        <footer className="p-3 bg-custom text-white text-center position-relative">
         <div className="container">
             <p className="lead">Copyright &copy; 2023 484 Final Project</p>
             <a href="#" className="position-absolute bottom-0 end-0 p-5">

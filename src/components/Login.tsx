@@ -73,7 +73,7 @@ const Login = () => {
 
 
 
-        <form className='bg-light p-2 shadow rounded-2' onSubmit={handleSubmit}>
+        <form className='shadow rounded-2' onSubmit={handleSubmit}>
             <div className="input-group mb-3">
                 <span className="input-group-text" id="basic-addon1">Email</span>
                 <input 

@@ -1,9 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+import './styles/loginStyle.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
+    const [ events, setEvents ] = useState<Event[]>([]);
+
+    interface Event {
+        name: string;
+        date_time: Date;
+        location: string;
+        description: string;
+        registration_deadline: Date;
+    }
+
+    const getEvents = async () => {
+        try {
+            const { data, error } = await supabase.from('events').select('*');
+            if (data) {
+                console.log('Fetching data', data);
+                setEvents(data);
+            } else {
+                console.log('No data fectched:', error);
+            }
+        } catch (error) {
+            console.log("Error checking session", error);
+        }
+    };
 
     useEffect(() => {
         const checkSession = async () => {
@@ -17,6 +42,7 @@ const ClientDashboard = () => {
             }
         };
         checkSession();
+        getEvents();
     }, [navigate]);
 
     const handleLogout = async () => {
@@ -36,7 +62,7 @@ const ClientDashboard = () => {
 
 
         {/* <!-- Navbar --> */}
-        <nav className="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <nav className="navbar navbar-expand-lg navbar-dark fixed-top bg-custom">
         <div className="container">
             <a href="#" className="navbar-brand">Media Naranja Speed Dating</a>
             {/* <!-- Hamburger Button --> */}
@@ -68,71 +94,29 @@ const ClientDashboard = () => {
         </nav>
         {/* <!-- Showcase --> */}
         <section
-        className="bg-dark text-light p-5 p-lg-0 pt-lg-5 text-center text-sm-start"
+        className="bg-custom text-light p-5 p-lg-0 pt-lg-5 text-center text-sm-start "
         >
         <div className="container">
             <div className="d-sm-flex align-items-center justify-content-between">
             <div>
                 <h1>Get ready to <span className="text-warning"> mingle </span></h1>
-                <p className="lead my-4">
-                We will focus on a great front end web application that will
-                host every single little thing.
+                <p className="lead my-3">
+                Dress to impress. Be yourself. Have fun.
                 </p>
-                <button
+                <a
                 className="btn btn-primary btn-lg"
+                href="https://www.instagram.com/medianaranjachicago/"
+                target="_blank"
+                rel="noopener noreferrer"
                 >
-                Start The Enrollment
-                </button>
+                Visit Our Instagram
+                </a>
             </div>
             <img
-                className="img-fluid w-50 d-none d-sm-block"
-                src="img/showcase.svg"
+                className="img-fluid w-35 d-none d-sm-block py-3"
+                src="/images/dashLogo.PNG"
                 alt="Showcase"
             />
-            </div>
-        </div>
-        </section>
-
-        {/* <!-- Boxes --> */}
-        <section className="p-5">
-        <div className="container">
-            <div className="row text-center g-4">
-            <div className="col-md">
-                <div className="card bg-dark text-light">
-                <div className="card-body text-center">
-                    <div className="h1 mb-3">
-                    <i className="bi bi-laptop"></i>
-                    </div>
-                    <h3 className="card-title">Virtual</h3>
-                    <p className="card-text">Lorem ipsum dolor sit amet con</p>
-                    <a href="#" className="btn btn-primary">Read More</a>
-                </div>
-                </div>
-            </div>
-            <div className="col-md">
-                <div className="card bg-secondary text-light">
-                <div className="card-body text-center">
-                    <div className="h1 mb-3">
-                    <i className="bi bi-person-square"></i>
-                    </div>
-                    <h3 className="card-title">Hybrid</h3>
-                    <p className="card-text">Lorem ipsum dolor sit amet con</p>
-                    <a href="#" className="btn btn-dark">Read More</a>
-                </div>
-                </div>
-            </div>
-            <div className="col-md">
-                <div className="card bg-dark text-light">
-                <div className="card-body text-center">
-                    <div className="h1 mb-3">
-                    <i className="bi bi-people"></i>
-                    </div>
-                    <h3 className="card-title">In-Person</h3>
-                    <p className="card-text">Lorem ipsum dolor sit amet con</p>
-                    <a href="#" className="btn btn-primary">Read More</a>
-                </div>
-                </div>
-            </div>
             </div>
         </div>
         </section>
@@ -140,24 +124,32 @@ const ClientDashboard = () => {
         {/* <!-- Learn Secitons --> */}
         <section className="p-5" id="schedule">
         <div className="container">
-            <div className="row align-items-center justify-content-between">
-            <div className="col-md">
-                <img src="img/fundamentals.svg" className="img-fluid" alt="" />
-            </div>
-            <div className="col-md p-5">
-                <h2>Schedule</h2>
-                <p className="lead">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est
-                nostrum modi aspernatur tenetur error beatae!
-                </p>
-                <a href="#" className="btn btn-light mt-3">
-                <i className="bi bit-chevron-right">Read More</i>
-                </a>
-            </div>
-            </div>
+                <h2 className='text-center mb-4'>Schedule</h2>
+                {events.map((event) => (
+                    <div className="row justify-content-center">
+                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3">
+                            <div className="text-center text-white">
+                                <div className="title">
+                                    <h4>{event.name}</h4>
+                                </div>
+                                <div>
+                                    <ul className='text-start list-unstyled'>
+                                        <li><span className='fw-bold'>Date: </span>{new Date(event.date_time).toLocaleDateString()} {new Date(event.date_time).toLocaleTimeString()}</li>
+                                        <li><span className='fw-bold'>Location: </span>{event.location}</li>
+                                        <li><span className='fw-bold'>Registration Deadline: </span>{new Date(event.registration_deadline).toLocaleDateString()} {new Date(event.registration_deadline).toLocaleTimeString()}</li>
+                                    </ul>
+                                    <h6>Description</h6>
+                                    <span>{event.description}</span>
+                                </div>
+                                <button className='btn btn-primary mt-2'>Reserve A Spot</button>
+                            </div>
+                        </div>
+                    </div>
+                ))};
         </div>
         </section>
-        <section className="p-5 bg-dark text-light" id="learn">
+
+        <section className="p-5 bg-primary text-light" id="learn">
         <div className="container">
             <div className="row align-items-center justify-content-between">
             <div className="col-md p-5">
@@ -191,7 +183,7 @@ const ClientDashboard = () => {
                     data-bs-toggle="collapse"
                     data-bs-target="#questions-one"
                 >
-                    Where are you located?
+                    Where is this at?
                 </button>
                 </h2>
                 <div
@@ -200,11 +192,8 @@ const ClientDashboard = () => {
                     data-bs-parent="#questions"
                 >
                     <div className="accordion-body">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Consequuntur, possimus aut vel optio reiciendis eligendi
-                        consequatur animi sunt placeat accusantium impedit hic
-                        necessitatibus enim error excepturi nulla distinctio ad rerum ut
-                        sit quis perferendis minima quisquam.
+                        The Media Naranja events happen at different locations. These will be listed in 
+                        each event
                     </div>
                 </div>
             </div>
@@ -226,11 +215,7 @@ const ClientDashboard = () => {
                     data-bs-parent="#questions"
                 >
                     <div className="accordion-body">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Consequuntur, possimus aut vel optio reiciendis eligendi
-                        consequatur animi sunt placeat accusantium impedit hic
-                        necessitatibus enim error excepturi nulla distinctio ad rerum ut
-                        sit quis perferendis minima quisquam.
+                        $20 per person
                     </div>
                 </div>
             </div>
@@ -252,11 +237,8 @@ const ClientDashboard = () => {
                     data-bs-parent="#questions"
                 >
                     <div className="accordion-body">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Consequuntur, possimus aut vel optio reiciendis eligendi
-                        consequatur animi sunt placeat accusantium impedit hic
-                        necessitatibus enim error excepturi nulla distinctio ad rerum ut
-                        sit quis perferendis minima quisquam. 
+                        Bring your ID if the event is held at a 21+ location. 
+                        Other than that everything is will be provided by our team
                     </div>
                 </div>
             </div>
@@ -278,9 +260,7 @@ const ClientDashboard = () => {
                 data-bs-parent="#questions"
                 >
                 <div className="accordion-body">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Consequuntur, possimus aut vel optio reiciendis eligendi
-                    consequatur animi sunt placeat accusantium 
+                    Dress to impress, you might meet your future spouse!
                 </div>
                 </div>
             </div>
@@ -293,7 +273,7 @@ const ClientDashboard = () => {
                     data-bs-toggle="collapse"
                     data-bs-target="#questions-five"
                 >
-                    Do you help me find a job?
+                    When is check-in?
                 </button>
                 </h2>
                 <div
@@ -302,98 +282,16 @@ const ClientDashboard = () => {
                 data-bs-parent="#questions"
                 >
                 <div className="accordion-body">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Consequuntur, possimus aut vel optio reiciendis eligendi
-                    consequatur animi sunt placeat accusantium impedit hic
-                    necessitatibus enim error excepturi nulla distinctio ad rerum ut
-                    sit quis perferendis minima quisquam. Exercitationem, cupiditate
-                    pariatur. Reprehenderit voluptates debitis sed eligendi velit
-                    laborum similique assumenda corrupti numquam?
+                    Check-in will be 30 minutes before each event
                 </div>
                 </div>
-            </div>
-            </div>
-        </div>
-        </section>
-
-        {/* <!-- instructors --> */}
-        <section id="instructors" className="p-5 bg-primary">
-        <div className="container">
-            <h2 className="text-center text-white">Our Team</h2>
-            <div className="row g-4 center">
-
-            <div className="col-md-6 col-lg-3">
-                <div className="card bg-light">
-                <div className="card-body text-center">
-                    <img
-                    src="https://randomuser.me/api/portraits/men/12.jpg"
-                    className="rounded-circle mb-3"
-                    alt=""
-                    />
-                    <h3 className="card-title mb-3">Joe Lick</h3>
-                    <p className="card-text">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Adipisci harum, sint perferendis beatae quisquam accusamus.
-                    </p>
-                    <a href="#"><i className="bi bi-twitter text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-facebook text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-instagram text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-linkedin text-dark mx-1"></i></a>
-                </div>
-                </div>
-            </div>
-
-            <div className="col-md-6 col-lg-3">
-                <div className="card bg-light">
-                <div className="card-body text-center">
-                    <img
-                    src="https://randomuser.me/api/portraits/women/12.jpg"
-                    className="rounded-circle mb-3"
-                    alt=""
-                    />
-                    <h3 className="card-title mb-3">Sara Smith</h3>
-                    <p className="card-text">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Adipisci harum, sint perferendis beatae quisquam accusamus.
-                    </p>
-                    <a href="#"><i className="bi bi-twitter text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-facebook text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-instagram text-dark mx-1"></i></a>
-                    <a href="#"><i className="bi bi-linkedin text-dark mx-1"></i></a>
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-        </section>
-
-        {/* <!-- Contact --> */}
-        <section className="p-5">
-        <div className="container">
-            <div className="row g-4">
-            <div className="col-md">
-                <h2 className="text-center mb-4">Contact Info</h2>
-                <ul className="list-group list-group-flush lead">
-                <li className="list-group-item">
-                    <span className="fw-bold">Main Location: </span>123 Main St
-                </li>
-                <li className="list-group-item">
-                    <span className="fw-bold">Student Phone </span>123-456-7890
-                </li>
-                <li className="list-group-item">
-                    <span className="fw-bold">Student Email: </span>123@google.com
-                </li>
-                <li className="list-group-item">
-                    <span className="fw-bold">Enrollment Email: </span>enroll@google.com
-                </li>
-                </ul>
             </div>
             </div>
         </div>
         </section>
 
         {/* <!-- Footer --> */}
-        <footer className="p-5 bg-dark text-white text-center position-relative">
+        <footer className="p-5 bg-custom text-white text-center position-relative">
         <div className="container">
             <p className="lead">Copyright &copy; 2023 484 Final Project</p>
             <a href="#" className="position-absolute bottom-0 end-0 p-5">
@@ -401,11 +299,6 @@ const ClientDashboard = () => {
             </a>
         </div>
         </footer>
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-            crossOrigin="anonymous"
-        ></script>
     </div>
     );
 };

@@ -7,6 +7,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 const ClientDashboard = () => {
     const navigate = useNavigate();
     const [ events, setEvents ] = useState<Event[]>([]);
+    const [ registered, setRegistered ] = useState<RegisteredE[]>([]);
+    const [refreshData, setRefreshData] = useState(false);
 
     interface Event {
         id: string,
@@ -16,6 +18,9 @@ const ClientDashboard = () => {
         description: string;
         registration_deadline: Date;
     }
+    interface RegisteredE {
+        event_id: string,
+    }
 
     const getEvents = async () => {
         try {
@@ -23,6 +28,21 @@ const ClientDashboard = () => {
             if (data) {
                 console.log(data);
                 setEvents(data);
+            } else {
+                console.log('No data fectched:', error);
+            }
+        } catch (error) {
+            console.log("Error checking session", error);
+        }
+    };
+
+    const getRegisterFor = async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const userID = user?.id;
+            const { data, error } = await supabase.from('event_participants').select('event_id').eq('user_id', userID);
+            if (data) {
+                setRegistered(data);
             } else {
                 console.log('No data fectched:', error);
             }
@@ -44,7 +64,8 @@ const ClientDashboard = () => {
         };
         checkSession();
         getEvents();
-    }, [navigate]);
+        getRegisterFor();
+    }, [navigate, refreshData]);
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
@@ -67,8 +88,24 @@ const ClientDashboard = () => {
         if (error) {
             console.log("From registering", error);
         }
-        // add some indicator that the person registered
-        // add a way to deregister
+        setRefreshData(prev => !prev);
+    };
+
+    const handleCancellation = async (event: string) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        const userID = user?.id;
+        // Add logic for unregistering here
+        console.log('Deleting In...');
+        const { error } = await supabase
+        .from('event_participants')
+        .delete()
+        .eq('user_id', userID)
+        .eq('event_id', event);
+
+        if (error) {
+            console.log("From unregistering", error);
+        }
+        setRefreshData(prev => !prev);
     };
 
     return (
@@ -155,7 +192,16 @@ const ClientDashboard = () => {
                                     <h6>Description</h6>
                                     <span>{event.description}</span>
                                 </div>
-                                <button  key={idx} className='btn btn-primary mt-2' onClick={() => handleRegistration(idx)}>Reserve A Spot</button>
+                                {registered.some(reg => reg.event_id === event.id) ? (
+                                <div>
+                                    <button className='btn btn-success mt-2' disabled>Registered</button>                                
+                                    <button className='mx-2 btn btn-danger mt-2' onClick={() => handleCancellation(event.id)}>
+                                    Cancel Registration
+                                    </button>
+                                </div>
+                                ) : 
+                                <button  key={idx} className='btn btn-primary mt-2' onClick={() => handleRegistration(idx)}>Reserve A Spot</button>                                
+                                }
                             </div>
                         </div>
                     </div>

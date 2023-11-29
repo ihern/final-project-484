@@ -6,6 +6,7 @@ import Login from './components/Login';
 import MVP from './components/MVP';
 import Signup from './components/Signup';
 import AdminDashboard from './components/AdminDashboard';
+import EventDetails from './components/EventDetails';
 import { supabase } from './services/supabase';
 import { Session } from '@supabase/supabase-js';
 
@@ -13,16 +14,17 @@ import { Session } from '@supabase/supabase-js';
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
 
+  const checkSession = async () => {
+    try {
+      const {data: { session }} = await supabase.auth.getSession();
+      setSession(session);
+    } catch (error) {
+      console.log("error checking session")
+    }
+    console.log('Session: ', session)
+  };
+
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const {data: { session }} = await supabase.auth.getSession();
-        setSession(session);
-      } catch (error) {
-        console.log("error checking session")
-      }
-    };
-    console.log(session);
     checkSession();
   }, []);
 
@@ -55,6 +57,10 @@ const App = () => {
           <Route 
             path="/admin/dashboard" 
             element={<AdminDashboard />}
+          />
+          <Route
+            path="/event/:eventId"
+            element={<EventDetails />}
           />
         </Routes>
       </BrowserRouter>

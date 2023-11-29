@@ -4,10 +4,11 @@ import { supabase } from '../services/supabase';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
   const [showModal, setShowModal] = useState(false);
   const [showSuccessBox, setShowSuccessBox] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<string[]>([]);
+  const [event_ids, setEventIds] = useState<string[]>([]);
   const [eventFormData, setEventFormData] = useState({
     name: '',
     date_time: '',
@@ -15,22 +16,22 @@ const AdminDashboard = () => {
     description: '',
     registration_deadline: '',
   });
-  const [upcomingEvents, setEvents] = useState<string[]>([]);
 
   const getEvents = async () => {
-    const { data, error } = await supabase.from('events').select('name')
+    const { data, error } = await supabase.from('events').select('name, id')
         if(error) {
           console.log('Error getting events: ', error);
         } else {
-          console.log(typeof(data))
-          const convert = data.map((obj: { name: string }) => obj.name)
-          setEvents(convert)
+          const event_names = data.map((obj: { name: string }) => obj.name);
+          const event_id = data.map((obj: { id: string }) => obj.id);
+          setEvents(event_names);
+          setEventIds(event_id);
         }
   };
  
-    useEffect(() => {
-      getEvents();
-    }, []);
+  useEffect(() => {
+    getEvents();
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -76,25 +77,27 @@ const AdminDashboard = () => {
     } else {
       setShowModal(false);
       setShowSuccessBox(true);
-
       setTimeout(() => {
         setShowSuccessBox(false);
       }, 3000);
-
     }
+  };
 
-    console.log(eventFormData)
+  const handleEventClick = (index: number) => {
+    navigate(`/event/${event_ids[index]}`, { state: { eventIndex: index } });
   };
 
   return (
     <div className="container-fluid">
-      <div className="row">
-        <div className="col-md-9">
-          <h1>Welcome to the Admin Dashboard Page!</h1>
+      <div className="row justify-content-center">
+        <div className="col-md-9 text-center">
+          <h1>Admin Dashboard</h1>
 
-          <button className="btn btn-primary mb-4" onClick={handleCreateEvent}>
-            Create Event
-          </button>
+          <div className='text-center p-4'>
+            <button className="btn btn-primary mb-4 text-center" onClick={handleCreateEvent}>
+              Create Event
+            </button>
+          </div>
 
           {showModal && (
             <div className="modal show" tabIndex={-1} role="dialog" style={{ display: 'block' }}>
@@ -142,7 +145,7 @@ const AdminDashboard = () => {
                           value={eventFormData.location}
                           onChange={handleChange}
                         />
-                      </div>
+                        </div>
 
                         <div className="mb-3">
                         <label className="form-label">Description</label>
@@ -169,8 +172,8 @@ const AdminDashboard = () => {
                       </div>
 
                       {error && (
-                                    <div className="alert alert-danger">{error}</div>
-                                )}
+                        <div className="alert alert-danger">{error}</div>
+                      )}
 
                       <button type="button" className="btn btn-primary" onClick={handleSaveEvent}>
                         Save Event
@@ -182,6 +185,7 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
         </div>
 
         {showSuccessBox && (
@@ -190,36 +194,30 @@ const AdminDashboard = () => {
             </div>
           )}
 
-        </div>
+      </div>
 
-        <div className="col-md-3">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Upcoming Events</h5>
-              <ul>
-                {upcomingEvents.map((event, index) => (
-                  <li key={index}>{event}</li>
-                ))}
-              </ul>
-            </div>
+        <div className="card text-center border-4 p-4 l-5 ">
+          <div className="card-body">
+            <h5 className="card-title">Upcoming Events</h5>
+            <ul className="list-unstyled d-flex flex-column align-items-center">
+              {events.map((event, index) => (
+                <li key={index} className='list-unstyled'>
+                  <button className='btn btn-primary btn-lg m-2' onClick={() => handleEventClick(index)}>
+                    {event}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          {/* <div className="card mt-4">
-            <div className="card-body">
-              <h5 className="card-title">Past Events</h5>
-              <ul>
-                {pastEvents.map((event, index) => (
-                  <li key={index}>{event}</li>
-                ))}
-              </ul>
-            </div>
-          </div> */}
-
-          <button className="btn btn-danger mt-4" onClick={handleLogout}>
+        </div>
+        
+        <div className='text-center p-4'>
+          <button className="btn btn-danger mt-4 text-center" onClick={handleLogout}>
             Logout
           </button>
         </div>
-      </div>
+
+    </div>
   );
 };
 

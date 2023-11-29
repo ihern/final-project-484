@@ -89,7 +89,7 @@ const Login = () => {
             <div className="input-group mb-3">
                 <span className="input-group-text" id="basic-addon1">Password</span>
                 <input 
-                    type="text" 
+                    type="password" 
                     className="form-control" 
                     placeholder="Type Here" 
                     aria-label="Email" 

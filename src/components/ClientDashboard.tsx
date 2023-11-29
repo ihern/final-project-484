@@ -6,8 +6,15 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
-    const [ events, setEvents ] = useState([{}]);
+    const [ events, setEvents ] = useState<Event[]>([]);
 
+    interface Event {
+        name: string;
+        date_time: Date;
+        location: string;
+        description: string;
+        registration_deadline: Date;
+    }
 
     const getEvents = async () => {
         try {
@@ -127,14 +134,14 @@ const ClientDashboard = () => {
                                 </div>
                                 <div>
                                     <ul className='text-start list-unstyled'>
-                                        <li><span>Date: </span>{new Date(event.date_time).toLocaleDateString()} {new Date(event.date_time).toLocaleTimeString()}</li>
-                                        <li><span>Location: </span>{event.location}</li>
-                                        <li>Registration Deadline: {new Date(event.registration_deadline).toLocaleDateString()} {new Date(event.registration_deadline).toLocaleTimeString()}</li>
+                                        <li><span className='fw-bold'>Date: </span>{new Date(event.date_time).toLocaleDateString()} {new Date(event.date_time).toLocaleTimeString()}</li>
+                                        <li><span className='fw-bold'>Location: </span>{event.location}</li>
+                                        <li><span className='fw-bold'>Registration Deadline: </span>{new Date(event.registration_deadline).toLocaleDateString()} {new Date(event.registration_deadline).toLocaleTimeString()}</li>
                                     </ul>
                                     <h6>Description</h6>
                                     <span>{event.description}</span>
                                 </div>
-                                <button className='btn btn-primary'>Reserve A Spot</button>
+                                <button className='btn btn-primary mt-2'>Reserve A Spot</button>
                             </div>
                         </div>
                     </div>

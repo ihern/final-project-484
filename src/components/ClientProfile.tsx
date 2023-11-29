@@ -56,6 +56,23 @@ const ClientProfile = () => {
         }
     };
 
+    const handleUpdate = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        const userID = user?.id;
+        const { error } = await supabase.from('profile').update(
+            {
+                funfact1: ff1,
+                funfact2: ff2,
+                funfact3: ff3,
+                funfact4: ff4,
+                funfact5: ff5
+            }
+        ).eq('id', userID);
+        if (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div className="container mt-5 pt-5">
             {/* <!-- Navbar --> */}
@@ -173,6 +190,7 @@ const ClientProfile = () => {
                                             id="submit" 
                                             name="submit" 
                                             className="btn btn-primary"
+                                            onClick={handleUpdate}
                                         >
                                             Update
                                         </button>

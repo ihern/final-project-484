@@ -9,7 +9,8 @@ const supabase = createClient('https://kuqqhdcrdwwemxnzxwow.supabase.co',
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT || 3000;
-const cache = {};
+const cache = {};   // temp storage for pairs
+const eventHistory = {};    // storage for previous pairs
 
 async function getQR(eventId) {
     const pairs = cache[eventId];
@@ -37,27 +38,68 @@ async function getQR(eventId) {
     return codes;
 }
 
+function areDiff(pair, prevPairs) {
+    if (prevPairs.length === 0) {
+        console.log('no previous pairs');
+      return true;
+    }
+  
+    for (const prevPair of prevPairs) {
+      // TODO
+    }
+  
+    return true; // Generated pair is different from all previous pairs
+}
+  
+
 function pairParticipants(users, event_id) {
     if (users.length % 2 !== 0) {
         console.log('Cannot pair, uneven number of participants!');
         return;
     }
     
+    const previousPairs = eventHistory[event_id] || [];
+
+    let attempts = 0;
+    let max_attempts = 100;
     const pairs = [];
     const temp = [...users];
 
-    while (temp.length > 0) {
-        const randomIndex = Math.floor(Math.random() * temp.length);
-        const user1 = temp.splice(randomIndex, 1)[0];
+    console.log('RESET');
 
-        const user2Index = Math.floor(Math.random() * temp.length);
-        const user2 = temp.splice(user2Index, 1)[0];
+    do {
+        
+        while (temp.length > 0) {
+            const randomIndex = Math.floor(Math.random() * temp.length);
+            const user1 = temp.splice(randomIndex, 1)[0];
+    
+            const user2Index = Math.floor(Math.random() * temp.length);
+            const user2 = temp.splice(user2Index, 1)[0];
+    
+            const token1 = uuidv4();
+            const token2 = uuidv4();
 
-        const token1 = uuidv4();
-        const token2 = uuidv4();
-        pairs.push([{ user: user1, token: token1 }, { user: user2, token: token2 }]);
+            pairs.push([{ user: user1, token: token1 }, { user: user2, token: token2 }]);
+            console.log('a pair here', pairs)
+
+        }
+        attempts++;
+    } while (!areDiff(pairs, previousPairs) && attempts < max_attempts);
+
+    console.log('amount of attempts', attempts);
+
+    if(attempts === max_attempts) {
+        console.log('Cannot pair, too many attempts!');
+        return;
     }
+
+    if(!eventHistory[event_id]) {
+        eventHistory[event_id] = [];
+    }
+
+    eventHistory[event_id].push(pairs);
     cache[event_id] = pairs;
+
     return pairs;
 }
 
@@ -75,6 +117,18 @@ const getUsers = async (event_id) => {
         return users;
     }
 };
+
+app.get('/shufflePairs/:eventId', async (req, res) => {
+    const eventId = req.params.eventId;
+    const data = await getUsers(eventId);
+    const pairs = pairParticipants(data, eventId);
+    if(!pairs) {
+        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+    } else {
+        console.log('Users paired successfully!', pairs);
+        res.status(200).send({ message: 'Users paired successfully!' });
+    }
+});
 
 app.get('/getPair/:eventId/:token', async (req, res) => {
     const eventId = req.params.eventId;
@@ -103,22 +157,23 @@ app.get('/startingEvent/:eventId', async (req, res) => {
     const data = await getUsers(eventId);
     const pairs = pairParticipants(data, eventId);
     if(!pairs) {
+        console.log('something happened here');
         res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
     } else {
         console.log('Users paired successfully!', pairs);
+        try {
+            // generate qr codes
+            const qrCodes = await getQR(eventId);
+            console.log('QR codes created successfully!');
+    
+            // send qr code to frontend
+            res.status(200).send(qrCodes);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
+        }
     }
-
-    try {
-        // generate qr codes
-        const qrCodes = await getQR(eventId);
-        console.log('QR codes created successfully!');
-
-        // send qr code to frontend
-        res.status(200).send(qrCodes);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
-    }
+    
 });
 
 app.get('/', async (req, res) => {

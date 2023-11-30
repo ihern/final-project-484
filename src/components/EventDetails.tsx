@@ -93,6 +93,21 @@ const EventDetails = () => {
 
   const shufflePairs = async () => {
     console.log('Shuffle button pressed !');
+    fetch(`http://localhost:3000/startingEvent/${eventId}`)
+    .then(response => {
+      if(!response.ok) {
+      throw new Error('Error fetching data from server');
+      } else {
+      return response.json();
+      }
+    })
+    .then(data => {
+      console.log(data);
+      setPairedQRData(data);
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
   };
 
   const handleDeleteConfirmation = () => {
@@ -119,7 +134,8 @@ const EventDetails = () => {
 
   const handleStartEvent = async () => {
     try {
-      fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
+      fetch(`http://localhost:3000/startingEvent/${eventId}`)
+      // fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
         .then(response => {
 
           if(!response.ok) {

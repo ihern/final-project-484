@@ -82,11 +82,11 @@ const ClientDashboard = () => {
                     } 
                     console.log(second);
                     if (second.length > 0) {
-                        console.log('Second match test query', second[0].user_id);
+                        console.log('Second match test query', selectedMatches[i].first_name);
                         setConfirmedMatch(prevMatches => [...prevMatches, ...second.map(item => ({
                             user_id: item.user_id,
-                            fname: '',
-                            email: '',
+                            fname: selectedMatches[i].first_name,
+                            email: selectedMatches[i].email,
                         }))]);
                     }
                 }
@@ -94,42 +94,7 @@ const ClientDashboard = () => {
         } catch (error) {
             console.log("Error getting matches", error);
         }
-        getMatchesInfo();
     }
-
-    const getMatchesInfo = async () => {
-        // console.log("Inside Matches Info", confirmedMatch);
-        const updatedConfirmedMatch = await Promise.all(
-            confirmedMatch.map(async (match) => {
-              const { data: _profile, error: selectError } = await supabase
-                .from('profile')
-                .select('*')
-                .eq('id', match.user_id);
-          
-              if (selectError) {
-                // console.log("Error retrieving data", selectError);
-                return match; // Return original match object if error occurs
-              }
-          
-              const userProfile = _profile[0];
-              if (userProfile) {
-                // If profile is found, update match object with retrieved data
-                return {
-                  ...match,
-                  fname: userProfile.fname,
-                  email: userProfile.email,
-                  // Update other fields as needed
-                };
-              }
-          
-              return match; // Return original match object if user profile not found
-            })
-          );
-          
-          // Update the state with the updatedConfirmedMatch array
-          setConfirmedMatch(updatedConfirmedMatch)
-    }
-
 
 
     const checkSession = async () => {

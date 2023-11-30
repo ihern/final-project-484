@@ -5,6 +5,7 @@
   "type": "module",
   "homepage": "https://super-flan-07f2d0.netlify.app/",
   "scripts": {
+    "start": "node src/server/server.js",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

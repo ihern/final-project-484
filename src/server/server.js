@@ -25,7 +25,7 @@ async function getQR(eventId) {
         for (const userObj of pair) {
 
             const { user, token } = userObj;
-            const code = await QRCode.toDataURL(`http://localhost:3000/getPair/${eventId}/${token}`);
+            const code = await QRCode.toDataURL(`https://four84-final-project-server.onrender.com/getPair/${eventId}/${token}`);
             qrCodes.push({user: user, qr_code: code});
         }
         const [firstUser, secondUser] = qrCodes;

@@ -96,11 +96,25 @@ const ClientProfile = () => {
     const handleMatch = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         const uID = user?.id;
+        
+        const { data: _profile, error: selectError } = await supabase
+        .from('profile')
+        .select('*')
+        .eq('id', userID);
+        if (selectError) {
+            console.log("Error retrieving data", selectError);
+            return;
+        }
+        const userProfile = _profile[0];
+        console.log(userProfile.fname);  
+
         const { error } = await supabase.from('matches')
         .insert(
             {
                 user_id: uID,
                 match_id: userID,
+                first_name: userProfile.fname,
+                email: userProfile.email,
             }
         );
         if (error) {

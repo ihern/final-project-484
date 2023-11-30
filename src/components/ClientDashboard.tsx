@@ -219,7 +219,7 @@ const ClientDashboard = () => {
             </div>
             <img
                 className="img-fluid w-35 d-none d-sm-block py-3"
-                src="/images/dashLogo.PNG"
+                src="/images/dashLogo.jpeg"
                 alt="Showcase"
             />
             </div>
@@ -232,7 +232,7 @@ const ClientDashboard = () => {
                 <h2 className='text-center mb-4'>Schedule</h2>
                 {events.map((event, idx) => (
                     <div key= {idx} className="row justify-content-center">
-                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3">
+                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3 shadow-lg">
                             <div className="text-center text-white">
                                 <div className="title">
                                     <h4>{event.name}</h4>
@@ -274,7 +274,7 @@ const ClientDashboard = () => {
                 </p>
                 {confirmedMatch.map((match, idx) => (
                     <div key= {idx} className="row justify-content-center">
-                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3">
+                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3 shadow-lg">
                             <div className="text-center text-white">
                                 <div className="title">
                                     <h4>Match {idx + 1}</h4>

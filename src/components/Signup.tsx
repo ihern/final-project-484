@@ -15,9 +15,13 @@ const Signup = () => {
     const [ff3, setFF3] = useState('');
     const [ff4, setFF4] = useState('');
     const [ff5, setFF5] = useState('');
-    const [userRole, setRole] = useState('Client');
+    const [userRole, setRole] = useState('client');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        if (!(email && password && firstName && lastName && ff1 && ff2 && ff3 && ff4 && ff5)) {
+            setError('Please fill out all fields');
+            return;
+        }
         console.log('handleSubmit called');
         e.preventDefault();
         try {

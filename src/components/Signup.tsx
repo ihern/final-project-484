@@ -15,10 +15,12 @@ const Signup = () => {
     const [ff3, setFF3] = useState('');
     const [ff4, setFF4] = useState('');
     const [ff5, setFF5] = useState('');
+    const [phoneNum, setPhoneNum] = useState('');
+    const [sex, setSex] = useState('');
     const [userRole, setRole] = useState('client');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        if (!(email && password && firstName && lastName && ff1 && ff2 && ff3 && ff4 && ff5)) {
+        if (!(email && password && firstName && lastName && ff1 && ff2 && ff3 && ff4 && ff5 && sex && phoneNum)) {
             setError('Please fill out all fields');
             return;
         }
@@ -38,6 +40,8 @@ const Signup = () => {
                         funfact4: ff4,
                         funfact5: ff5,
                         role: userRole,
+                        sex: sex,
+                        phone_number: phoneNum,
                     }
                 }         
              });
@@ -108,6 +112,28 @@ const Signup = () => {
                                             id="inputPassword4"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row g-3 py-4">
+                                    <div className="col">
+                                        <label htmlFor="inputEmail4" className="form-label">Sex</label>
+                                        <input 
+                                            type="email" 
+                                            className="form-control" 
+                                            id="inputEmail4"
+                                            value={sex}
+                                            onChange={(e) => setSex(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="col">
+                                        <label htmlFor="inputPassword4" className="form-label">Phone Number</label>
+                                        <input 
+                                            type="password" 
+                                            className="form-control" 
+                                            id="inputPassword4"
+                                            value={phoneNum}
+                                            onChange={(e) => setPhoneNum(e.target.value)}
                                         />
                                     </div>
                                 </div>

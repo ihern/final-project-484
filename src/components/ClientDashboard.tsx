@@ -94,10 +94,11 @@ const ClientDashboard = () => {
         } catch (error) {
             console.log("Error getting matches", error);
         }
+        getMatchesInfo();
     }
 
     const getMatchesInfo = async () => {
-        console.log("Inside Matches Info",confirmedMatch);
+        // console.log("Inside Matches Info", confirmedMatch);
         const updatedConfirmedMatch = await Promise.all(
             confirmedMatch.map(async (match) => {
               const { data: _profile, error: selectError } = await supabase
@@ -106,7 +107,7 @@ const ClientDashboard = () => {
                 .eq('id', match.user_id);
           
               if (selectError) {
-                console.log("Error retrieving data", selectError);
+                // console.log("Error retrieving data", selectError);
                 return match; // Return original match object if error occurs
               }
           
@@ -147,7 +148,6 @@ const ClientDashboard = () => {
         getEvents();
         getRegisterFor();
         getMatches();
-        getMatchesInfo();
     }, [refreshData]);
 
     const handleLogout = async () => {
@@ -316,7 +316,6 @@ const ClientDashboard = () => {
                                 </div>
                                 <div>
                                     <ul className='text-start list-unstyled'>
-                                        <li><span className='fw-bold'>TEST ID: </span>{match.user_id}</li>
                                         <li><span className='fw-bold'>First Name: </span>{match.fname}</li>
                                         <li><span className='fw-bold'>Email: </span>{match.email}</li>
                                     </ul>
@@ -324,7 +323,7 @@ const ClientDashboard = () => {
                             </div>
                         </div>
                     </div>
-                ))};
+                ))}
             </div>
             </div>
         </div>

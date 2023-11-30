@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useEffect, useState } from 'react';
 
 const ClientProfile = () => {
+    const { userID } = useParams();
 
     const navigate = useNavigate();
     const [email, setEmail] = useState('no user');
@@ -13,35 +14,33 @@ const ClientProfile = () => {
     const [ ff3, setFF3] = useState('');
     const [ ff4, setFF4] = useState('');
     const [ ff5, setFF5] = useState('');
+    const [editing, setEditing] = useState(false);
+
 
     const getProfile = async () => {
-        const { data: { user }, error: sessionError } = await supabase.auth.getUser()
-        const userID = user?.id;
-    
-        if(sessionError) {
-            console.log('Could not retrieve authSession', sessionError);
+        const { data: { user } } = await supabase.auth.getUser();
+        const uID = user?.id;
+        if (userID === uID) {
+            setEditing(true);
+        }
+        // console.log('User id found, quering data');
+        const { data: _profile, error: selectError } = await supabase
+        .from('profile')
+        .select('*').eq('id', userID);
+        if (selectError){
+            console.log("Error retrieving data", selectError);
             return;
         }
-        else {
-            // console.log('User id found, quering data');
-            const { data: _profile, error: selectError } = await supabase
-            .from('profile')
-            .select('*').eq('id', userID);
-            if (selectError){
-                console.log("Error retrieving data", selectError);
-                return;
-            }
-            // console.log("PROFILE HERE", _profile);
-            const userProfile = _profile[0];
-            setEmail(userProfile.email);
-            setFName(userProfile.fname);
-            setLName(userProfile.lname);
-            setFF1(userProfile.funfact1);
-            setFF2(userProfile.funfact2);
-            setFF3(userProfile.funfact3);
-            setFF4(userProfile.funfact4);
-            setFF5(userProfile.funfact5);
-        }
+        // console.log("PROFILE HERE", _profile);
+        const userProfile = _profile[0];
+        setEmail(userProfile.email);
+        setFName(userProfile.fname);
+        setLName(userProfile.lname);
+        setFF1(userProfile.funfact1);
+        setFF2(userProfile.funfact2);
+        setFF3(userProfile.funfact3);
+        setFF4(userProfile.funfact4);
+        setFF5(userProfile.funfact5);
     };
 
     useEffect(() => {
@@ -57,9 +56,8 @@ const ClientProfile = () => {
     };
 
     const handleUpdate = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        const userID = user?.id;
-        const { error } = await supabase.from('profile').update(
+        const { error } = await supabase.from('profile')
+        .update(
             {
                 funfact1: ff1,
                 funfact2: ff2,
@@ -135,6 +133,7 @@ const ClientProfile = () => {
                                         className="form-control" 
                                         value={ff1}
                                         onChange={(e) => setFF1(e.target.value)}
+                                        disabled={!editing}
                                     />
                                 </div>
                             </div>
@@ -146,6 +145,7 @@ const ClientProfile = () => {
                                         className="form-control" 
                                         value={ff2}
                                         onChange={(e) => setFF2(e.target.value)}
+                                        disabled={!editing}
                                     />
                                 </div>
                             </div>
@@ -156,7 +156,8 @@ const ClientProfile = () => {
                                         type="text" 
                                         className="form-control"
                                         value={ff3}
-                                        onChange={(e) => setFF3(e.target.value)} 
+                                        onChange={(e) => setFF3(e.target.value)}
+                                        disabled={!editing} 
                                     />
                                 </div>
                             </div>
@@ -168,6 +169,7 @@ const ClientProfile = () => {
                                         className="form-control" 
                                         value={ff4}
                                         onChange={(e) => setFF4(e.target.value)}
+                                        disabled={!editing}
                                     />
                                 </div>
                             </div>
@@ -179,10 +181,11 @@ const ClientProfile = () => {
                                         className="form-control" 
                                         value={ff5}
                                         onChange={(e) => setFF5(e.target.value)}
+                                        disabled={!editing}
                                     />
                                 </div>
                             </div>
-                            <div className="row gutters">
+                            {editing && (<div className="row gutters">
                                 <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div className="text-right my-4">
                                         <button 
@@ -196,7 +199,7 @@ const ClientProfile = () => {
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </div>)}
                         </div>
                     </div>
                 </div>

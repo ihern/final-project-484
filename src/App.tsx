@@ -43,9 +43,9 @@ const App = () => {
             element={isAuthenticated ? <ClientDashboard/> : <Navigate to ='/' />}
           />
           <Route
-            path="/client/profile"
+            path="/client/profile/:userID"
             element={isAuthenticated ? <ClientProfile/> : <Navigate to ='/' />}
-          />
+            />
           <Route
             path="/mvp" 
             element={<MVP />} 

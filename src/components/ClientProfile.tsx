@@ -176,7 +176,8 @@ const ClientProfile = () => {
                                             className="img-fluid"
                                         />
                                     </div>
-                                    <h5 className="mb-2 text-primary">Your Profile</h5>
+                                    {editing && (<h5 className="mb-2 text-primary">Your Profile</h5>)}
+                                    {!editing && (<h5 className="mb-2 text-primary">Partner's Profile</h5>)}
                                     <h5 className="user-name">{`${fName} ${lName}`}</h5>
                                     <h6 className="user-email">{`${email}`}</h6>
                                 </div>
@@ -188,7 +189,8 @@ const ClientProfile = () => {
                     <div className="card h-100">
                         <div className="card-body">
                             <div className="row gutters col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                <h6 className="mb-3 text-primary">YOUR FUN FACTS!</h6>
+                                {editing && (<h6 className="mb-3 text-primary">YOUR FUN FACTS!</h6>)}
+                                {!editing && (<h6 className="mb-3 text-primary">PARTNER'S FUN FACTS!</h6>)}
                             </div>
                             <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div className="form-group">

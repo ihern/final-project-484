@@ -3,10 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useEffect } from 'react';
 
+interface PairedQRData {
+  user_id: string;
+  paired_qr: string;
+}
+
 const EventDetails = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
+  const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showSuccessBox, setShowSuccessBox] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,9 +95,22 @@ const EventDetails = () => {
   };
 
   const handleStartEvent = async () => {
-    // Implement logic to start the event
-    // You can update the event status or perform any other actions
-    // setShowSuccessBox(true);
+    fetch(`http://localhost:3000/startingEvent/${eventId}`)
+      .then(response => {
+        if(!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        setPairedQRData(data);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+
+
   };
 
   useEffect(() => {
@@ -102,7 +121,7 @@ const EventDetails = () => {
 
   return (
     <div className="container mt-4">
-        <div className="d-flex align-items-center p-2">
+      <div className="d-flex justify-content-between align-items-center">
         <h2>Event Details for {eventData.name}!</h2>
         </div>
 
@@ -111,14 +130,13 @@ const EventDetails = () => {
         </button>
 
         <button className="btn btn-success p-2 m-3" onClick={handleStartEvent}>
-            Start Event
+          Start Event
         </button>
 
         <button className="btn btn-danger p-2" onClick={handleDeleteConfirmation}>
-            Delete Event
+          Delete Event
         </button>
         
-
         {showSuccessBox && (
             <div className="alert alert-success" role="alert">
               Event added successfully!
@@ -142,9 +160,20 @@ const EventDetails = () => {
             <strong>Registration Deadline:</strong> {eventData.registration_deadline}
             </div>
         </div>
-      <button className="btn btn-primary" onClick={handleEdit}>
-        Edit Event
-      </button>
+
+        <button className="btn btn-primary m-2 b-2" onClick={handleEdit}>
+          Edit Event
+        </button>
+
+        <div>
+        <h2>Paired QR Codes</h2>
+        {pairedQRData.map((pair, index) => (
+          <div key={index}>
+            <p>User ID: {pair.user_id}</p>
+            <img src={pair.paired_qr} alt={`QR Code for ${pair.user_id}`} />
+          </div>
+        ))}
+        </div>
 
         {isEditing && (
             <div className="modal show" tabIndex={-1} role="dialog" style={{ display: 'block' }}>
@@ -246,7 +275,6 @@ const EventDetails = () => {
             </div>
             </div>
       )}
-
     </div>
   );
 };

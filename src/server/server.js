@@ -39,7 +39,7 @@ async function getQR(eventId) {
 
 function pairParticipants(users, event_id) {
     if (users.length % 2 !== 0) {
-        console.log('Cannot pair');
+        console.log('Cannot pair, uneven number of participants!');
         return;
     }
     
@@ -103,20 +103,21 @@ app.get('/startingEvent/:eventId', async (req, res) => {
     const data = await getUsers(eventId);
     const pairs = pairParticipants(data, eventId);
     if(!pairs) {
-        res.status(400).send('Cannot pair');
+        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
     } else {
-        console.log('these are the pairs', pairs);
+        console.log('Users paired successfully!', pairs);
     }
 
     try {
         // generate qr codes
         const qrCodes = await getQR(eventId);
+        console.log('QR codes created successfully!');
 
         // send qr code to frontend
         res.status(200).send(qrCodes);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error generating QR code');
+        res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
     }
 });
 

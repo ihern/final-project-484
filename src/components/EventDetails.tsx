@@ -12,11 +12,19 @@ const EventDetails = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
-  const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [showSuccessBox, setShowSuccessBox] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // for modal
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [error, setError] = useState<string | null>(null);  // for modal
+
+  // for dashboard
+  const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
+  const [startEventButton, setStartEventButton] = useState(false);
+  const [eventNotification, setEventNotification] = useState<string | null>(null);  // general notification
+  const [isSuccess, setIsSuccess] = useState(false);  // for general notification
+  const [canEndEvent, setCanEndEvent] = useState(false);
+  
+  // sets event data
   const [eventData, setEventData] = useState({
     name: '',
     date_time: '',
@@ -57,20 +65,35 @@ const EventDetails = () => {
         .eq('id', eventId)
         .select();
     if (error) {
+
       console.log('Error updating event: ', error);
       setError(error.message);
+
       setTimeout(() => {
         setError(null);
       }, 1500);
+
     } else {
+
         console.log('Event updated: ', data);
         handleCloseModal();
-        setShowSuccessBox(true);
+        setEventNotification('Event updated successfully!');
+        setIsSuccess(true);
+
         setTimeout(() => {
-            setShowSuccessBox(false);
+          setEventNotification(null)
         }, 3000);
+
     }
   }
+
+  const handleEndEventButton = async () => {
+
+  };
+
+  const shufflePairs = async () => {
+    console.log('Shuffle button pressed !');
+  };
 
   const handleDeleteConfirmation = () => {
     setShowDeleteConfirmation(true);
@@ -98,20 +121,41 @@ const EventDetails = () => {
     try {
       fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
         .then(response => {
+
           if(!response.ok) {
-            throw new Error('Network response was not ok');
-          }
+            setEventNotification(response.statusText);
+            setIsSuccess(false);
+            
+            setTimeout(() => {
+              setEventNotification(null)
+            }, 3000);
+
+          throw new Error('Error fetching data from server');
+
+          } else {
           return response.json();
+          }
+
         })
         .then(data => {
+
           console.log(data);
           setPairedQRData(data);
+          setStartEventButton(true);
+          setEventNotification('Event has started!');
+          setIsSuccess(true);
+          setCanEndEvent(true);
+
         })
         .catch(error => {
+          
+          setEventNotification(error.message);
+          setIsSuccess(false);
           console.error('There has been a problem with your fetch operation:', error);
+
         });
     } catch (error) {
-      console.log('Error reaching server: ', error);
+      console.log('Failed to reach server: ', error);
     }
 
   };
@@ -128,54 +172,74 @@ const EventDetails = () => {
         <h2>Event Details for {eventData.name}!</h2>
         </div>
 
-        <button className="btn btn-secondary p-2" onClick={handleBack}>
-          Back
-        </button>
+        {eventNotification && (
+                        <div className={isSuccess ? 'alert alert-success' : "alert alert-danger"}>{eventNotification}</div>
+        )}
 
-        <button className="btn btn-success p-2 m-3" onClick={handleStartEvent}>
-          Start Event
-        </button>
-
-        <button className="btn btn-danger p-2" onClick={handleDeleteConfirmation}>
-          Delete Event
-        </button>
-        
-        {showSuccessBox && (
-            <div className="alert alert-success" role="alert">
-              Event added successfully!
-            </div>
-          )}
-
-        <div className="mt-4">
+        <div className="row mt-4">
+          <div className="col-md-6">
+            <button className="btn btn-secondary p-2" onClick={handleBack}>
+              Back
+            </button>
+            <button className="btn btn-success p-2 m-3" onClick={handleStartEvent} disabled={startEventButton}>
+              Start Event
+            </button>
+            <button className="btn btn-danger p-2" onClick={handleDeleteConfirmation} disabled={startEventButton}>
+              Delete Event
+            </button>
             <div className="mb-3">
-            <strong>Name:</strong> {eventData.name}
+              <strong>Name:</strong> {eventData.name}
             </div>
             <div className="mb-3">
-            <strong>Date and Time:</strong> {eventData.date_time}
+              <strong>Date and Time:</strong> {eventData.date_time}
             </div>
             <div className="mb-3">
-            <strong>Location:</strong> {eventData.location}
+              <strong>Location:</strong> {eventData.location}
             </div>
             <div className="mb-3">
-            <strong>Description:</strong> {eventData.description}
+              <strong>Description:</strong> {eventData.description}
             </div>
             <div className="mb-3">
-            <strong>Registration Deadline:</strong> {eventData.registration_deadline}
+              <strong>Registration Deadline:</strong> {eventData.registration_deadline}
             </div>
-        </div>
+            <button className="btn btn-primary mb-3" onClick={handleEdit} disabled={startEventButton}>
+              Edit Event
+            </button>
+            {canEndEvent && (
+              <button className="btn btn-danger mb-3" onClick={handleEndEventButton}>
+                End Event
+              </button>
+            )}
 
-        <button className="btn btn-primary m-2 b-2" onClick={handleEdit}>
-          Edit Event
-        </button>
-
-        <div>
-        <h2>Paired QR Codes</h2>
-        {pairedQRData.map((pair, index) => (
-          <div key={index}>
-            <p>User ID: {pair.user_id}</p>
-            <img src={pair.paired_qr} alt={`QR Code for ${pair.user_id}`} />
+            <div className="tips-box">
+            <h3>General Tips Before Starting Event</h3>
+            <ul>
+              <li>Total number of registered users must be even! (everyone has to talk to someone)</li>
+              <li>New QR codes must be regenerated every rotation</li>
+              <li>Users must be present in the event to be paired</li>
+              <li>DO NOT spam the start Start Event button (Can take up to 15 seconds to generate QR Codes)</li>
+            </ul>
+            </div>
           </div>
-        ))}
+
+          <div className='col-md-6 border'>
+            <div className='row mt-3'>
+              <div className='col-md-6'>
+                <h2>Codes For Each User</h2>
+              </div>
+              <div className='col-md-6'>
+                <button className='btn btn-primary mb-3' onClick={shufflePairs} disabled={!startEventButton}>
+                  Shuffle
+                </button>
+              </div>
+            </div>
+            {pairedQRData.map((pair, index) => (
+            <div key={index}>
+              <p>User ID: {pair.user_id}</p>
+              <img src={pair.paired_qr} alt={`QR Code for ${pair.user_id}`} />
+            </div>
+          ))}
+          </div>
         </div>
 
         {isEditing && (

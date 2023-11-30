@@ -8,6 +8,7 @@ const ClientDashboard = () => {
     const navigate = useNavigate();
     const [ events, setEvents ] = useState<Event[]>([]);
     const [ registered, setRegistered ] = useState<RegisteredE[]>([]);
+    const [ confirmedMatch, setConfirmedMatch ] = useState<Match[]>([]);
     const [refreshData, setRefreshData] = useState(false);
 
     interface Event {
@@ -20,6 +21,11 @@ const ClientDashboard = () => {
     }
     interface RegisteredE {
         event_id: string,
+    }
+    interface Match {
+        user_id: string,
+        fname: string,
+        email: string,
     }
 
     const getEvents = async () => {
@@ -50,21 +56,99 @@ const ClientDashboard = () => {
         }
     };
 
-    useEffect(() => {
-        const checkSession = async () => {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    navigate('/', { replace: true });
-                }
-            } catch (error) {
-                console.log("Error checking session", error);
+    const getMatches = async () => {
+        try{
+            setConfirmedMatch([]);
+            const { data: { user } } = await supabase.auth.getUser();
+            const uID = user?.id;
+
+            const { data: selectedMatches , error: firstE} = await supabase.from('matches')
+            .select('*').eq('user_id', uID);
+            
+            if (firstE){
+                console.log("Error retrieving matches", firstE);
+                return;
             }
-        };
+            
+            if (selectedMatches.length > 0) {
+                const matchIds = selectedMatches.map(match => match.match_id);
+                 
+                for (let i = 0; i < matchIds.length; i++) {
+                    const { data: second , error: secondE} = await supabase.from('matches')
+                    .select('*').eq('user_id', matchIds[i]).eq('match_id', uID);
+                    if (secondE){
+                        console.log("Error retrieving matches", secondE);
+                        return;
+                    } 
+                    console.log(second);
+                    if (second.length > 0) {
+                        console.log('Second match test query', second[0].user_id);
+                        setConfirmedMatch(prevMatches => [...prevMatches, ...second.map(item => ({
+                            user_id: item.user_id,
+                            fname: '',
+                            email: '',
+                        }))]);
+                    }
+                }
+            }
+        } catch (error) {
+            console.log("Error getting matches", error);
+        }
+    }
+
+    const getMatchesInfo = async () => {
+        console.log("Inside Matches Info",confirmedMatch);
+        const updatedConfirmedMatch = await Promise.all(
+            confirmedMatch.map(async (match) => {
+              const { data: _profile, error: selectError } = await supabase
+                .from('profile')
+                .select('*')
+                .eq('id', match.user_id);
+          
+              if (selectError) {
+                console.log("Error retrieving data", selectError);
+                return match; // Return original match object if error occurs
+              }
+          
+              const userProfile = _profile[0];
+              if (userProfile) {
+                // If profile is found, update match object with retrieved data
+                return {
+                  ...match,
+                  fname: userProfile.fname,
+                  email: userProfile.email,
+                  // Update other fields as needed
+                };
+              }
+          
+              return match; // Return original match object if user profile not found
+            })
+          );
+          
+          // Update the state with the updatedConfirmedMatch array
+          setConfirmedMatch(updatedConfirmedMatch)
+    }
+
+
+
+    const checkSession = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                navigate('/', { replace: true });
+            }
+        } catch (error) {
+            console.log("Error checking session", error);
+        }
+    };
+    
+    useEffect(() => {
         checkSession();
         getEvents();
         getRegisterFor();
-    }, [navigate, refreshData]);
+        getMatches();
+        getMatchesInfo();
+    }, [refreshData]);
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
@@ -93,7 +177,7 @@ const ClientDashboard = () => {
     const handleCancellation = async (event: string) => {
         const { data: { user } } = await supabase.auth.getUser();
         const userID = user?.id;
-        // Add logic for unregistering here
+        
         console.log('Deleting In...');
         const { error } = await supabase
         .from('event_participants')
@@ -219,17 +303,28 @@ const ClientDashboard = () => {
         <div className="container">
             <div className="row align-items-center justify-content-between">
             <div className="col-md p-5">
-                <h2>Learn About Speed Dating</h2>
+                <h2>My Matches</h2>
                 <p className="lead">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est
-                nostrum modi aspernatur tenetur error beatae!
+                After each event any matches will display in this section!
                 </p>
-                <a href="#" className="btn btn-light mt-3">
-                <i className="bi bit-chevron-right">Read More</i>
-                </a>
-            </div>
-            <div className="col-md">
-                <img src="img/react.svg" className="img-fluid" alt="" />
+                {confirmedMatch.map((match, idx) => (
+                    <div key= {idx} className="row justify-content-center">
+                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-12 bg-secondary rounded p-4 m-3">
+                            <div className="text-center text-white">
+                                <div className="title">
+                                    <h4>Match {idx + 1}</h4>
+                                </div>
+                                <div>
+                                    <ul className='text-start list-unstyled'>
+                                        <li><span className='fw-bold'>TEST ID: </span>{match.user_id}</li>
+                                        <li><span className='fw-bold'>First Name: </span>{match.fname}</li>
+                                        <li><span className='fw-bold'>Email: </span>{match.email}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))};
             </div>
             </div>
         </div>

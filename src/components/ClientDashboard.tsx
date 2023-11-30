@@ -26,7 +26,6 @@ const ClientDashboard = () => {
         try {
             const { data, error } = await supabase.from('events').select('*');
             if (data) {
-                console.log(data);
                 setEvents(data);
             } else {
                 console.log('No data fectched:', error);
@@ -108,6 +107,12 @@ const ClientDashboard = () => {
         setRefreshData(prev => !prev);
     };
 
+    const navProfile = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const userID = user?.id;
+        navigate(`/client/profile/${userID}`);
+    };
+
     return (
         <div className="landing-page">
 
@@ -127,7 +132,7 @@ const ClientDashboard = () => {
             <div className="collapse navbar-collapse" id="navmenu">
             <ul className="navbar-nav ms-auto">
                 <li className="nav-item">
-                <a onClick={() => navigate('/client/profile')} className="nav-link">Profile</a>
+                <a onClick={navProfile} className="nav-link">Profile</a>
                 </li>
                 <li className="nav-item">
                 <a href="#schedule" className="nav-link">Schedule</a>

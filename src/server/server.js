@@ -155,6 +155,8 @@ app.get('/startingEvent/:eventId', async (req, res) => {
 
     const qrCodes = await getQR(eventId, paired_sessions);
     
+    console.log('users', data.length)
+    
     return res.status(200).send(qrCodes);
     // const pairs = pairParticipants(data, eventId);
     // if(!pairs) {

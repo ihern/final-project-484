@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate, PathRouteProps } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useEffect } from 'react';
 
@@ -18,15 +18,14 @@ const EventDetails = () => {
   const [error, setError] = useState<string | null>(null);  // for modal
 
   // for dashboard
-  const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
-  const [displayQR, setDisplayQR] = useState<PairedQRData[][]>([]);
+  const [splitQRData, setSplitQRData] = useState<PairedQRData[][]>([]);
+  const [displayQR, setDisplayQR] = useState<PairedQRData[]>([]);
+  const [qrIndex, setqrIndex] = useState(0);
   const [startEventButton, setStartEventButton] = useState(false);
   const [eventNotification, setEventNotification] = useState<string | null>(null);  // general notification
   const [isSuccess, setIsSuccess] = useState(false);  // for general notification
   const [canEndEvent, setCanEndEvent] = useState(false);
-  const [round, setRound] = useState(0);
   const [totalRounds, setTotalRounds] = useState(0);
-  
   
   // sets event data
   const [eventData, setEventData] = useState({
@@ -46,7 +45,6 @@ const EventDetails = () => {
     if (error) {
       console.log('Error getting event: ', error);
     } else {
-      // console.log('Event: ', data);
       setEventData(data);
     }
   };
@@ -54,6 +52,7 @@ const EventDetails = () => {
   const handleEdit = () => {
     setIsEditing(true);
   };
+
   const handleCloseModal = () => {
     setIsEditing(false);
   };
@@ -89,19 +88,23 @@ const EventDetails = () => {
         }, 3000);
 
     }
-  }
+  };
 
   const handleEndEventButton = async () => {
 
   };
 
   const shufflePairs = async () => {
-    console.log('Inside shufflePairs');
-    if (round + 1 !== totalRounds) {
-      setRound(prevRound => prevRound + 1);
-    } else {
-      setError('EVENT OVER');
+    console.log('Shuffling pairs...');
+    console.log('index at', qrIndex);
+    if(qrIndex + 1 > totalRounds) {
+      setEventNotification('Event has ended!');
+      return;
     }
+    setqrIndex(qrIndex => qrIndex + 1);
+    // setqrIndex(qrIndex + 1);
+    console.log('index at after', qrIndex);
+    setDisplayQR(splitQRData[qrIndex]);
   };
 
   const handleDeleteConfirmation = () => {
@@ -126,20 +129,6 @@ const EventDetails = () => {
     }
   };
 
-  // const startDisplayQR = async () => {
-  //   console.log("INSIDE startDisplayQR");
-  //   // console.log('number of ppl in event', data.length);
-  //   const pairs = ppl.length/2;
-  //   setTotalRounds(pairs);
-  //   console.log(pairedQRData.length);
-  //   for (let i = 0; i < pairedQRData.length; i += pairs) {
-  //     const slicedData = pairedQRData.slice(i, i + pairs);
-  //     setDisplayQR(prevDisplayQR => [...prevDisplayQR, slicedData]);
-  //     console.log("This is slicedData", slicedData)
-  //   }
-  //   console.log("End of startDisplayQR");
-  // }
-
   const handleStartEvent = async () => {
     try {
       fetch(`http://localhost:3000/startingEvent/${eventId}`)
@@ -162,25 +151,24 @@ const EventDetails = () => {
 
         })
         .then(data => {
+          console.log("Data:", data);
 
-          // console.log(data);
-          // setPairedQRData(data);
-          // const numberOfPairs = Math.sqrt(data.length);
-          const numberOfPairs = 3;
-          setTotalRounds(numberOfPairs);
+          const numberOfShuffles = Math.sqrt(data.length / 2);  // 3
+          const numberOfQrs = numberOfShuffles * 2;  // 6
           const splitArrays = [];
-          console.log(numberOfPairs);
-
           const x: PairedQRData[] = data;
-          console.log(x);
 
-          for (let i = 0; i < x.length; i += numberOfPairs) {
-            const chunk = x.slice(i, i + numberOfPairs);
+          for (let i = 0; i < x.length; i += numberOfQrs) {
+            const chunk = x.slice(i, i + numberOfShuffles * 2);
             splitArrays.push(chunk);
           }
-          console.log("SplitArrays:", splitArrays);
-          setDisplayQR(splitArrays);
           
+          setqrIndex(0);
+          setDisplayQR(splitArrays[qrIndex]);
+          setqrIndex(1);
+          setTotalRounds(numberOfShuffles);
+          setSplitQRData(splitArrays);
+
           setStartEventButton(true);
           setEventNotification('Event has started!');
           setIsSuccess(true);
@@ -272,7 +260,7 @@ const EventDetails = () => {
                 </button>
               </div>
             </div>
-            {displayQR[0].map((pair, index) => (
+            {displayQR.map((pair, index) => (
             <div key={index}>
               <p>User ID: {pair.user}</p>
               <img src={pair.qr_code} alt={`QR Code for ${pair.user}`} />

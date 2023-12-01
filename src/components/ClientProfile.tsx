@@ -115,6 +115,7 @@ const ClientProfile = () => {
                 match_id: userID,
                 first_name: userProfile.fname,
                 email: userProfile.email,
+                phone_number: userProfile.phone_number,
             }
         );
         if (error) {

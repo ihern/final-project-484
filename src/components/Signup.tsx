@@ -115,23 +115,26 @@ const Signup = () => {
                                         />
                                     </div>
                                 </div>
-                                <div className="row g-3 py-4">
+                                <div className="row g-3 py-2">
                                     <div className="col">
-                                        <label htmlFor="inputEmail4" className="form-label">Sex</label>
-                                        <input 
-                                            type="email" 
-                                            className="form-control" 
-                                            id="inputEmail4"
+                                        <label htmlFor="sexSelect" className="form-label">Sex</label>
+                                        <select
+                                            id="sexSelect"
+                                            className="form-select"
                                             value={sex}
                                             onChange={(e) => setSex(e.target.value)}
-                                        />
+                                        >
+                                            <option value="">Select Sex</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
                                     </div>
                                     <div className="col">
-                                        <label htmlFor="inputPassword4" className="form-label">Phone Number</label>
+                                        <label htmlFor="phoneNum" className="form-label">Phone Number</label>
                                         <input 
-                                            type="password" 
+                                            type="text" 
                                             className="form-control" 
-                                            id="inputPassword4"
+                                            id="phoneNum"
                                             value={phoneNum}
                                             onChange={(e) => setPhoneNum(e.target.value)}
                                         />

@@ -25,7 +25,8 @@ const ClientDashboard = () => {
     interface Match {
         user_id: string,
         fname: string,
-        email: string,
+        email: string
+        phone: string,
     }
 
     const getEvents = async () => {
@@ -87,6 +88,7 @@ const ClientDashboard = () => {
                             user_id: item.user_id,
                             fname: selectedMatches[i].first_name,
                             email: selectedMatches[i].email,
+                            phone: selectedMatches[i].phone_number,
                         }))]);
                     }
                 }
@@ -283,6 +285,7 @@ const ClientDashboard = () => {
                                     <ul className='text-start list-unstyled'>
                                         <li><span className='fw-bold'>First Name: </span>{match.fname}</li>
                                         <li><span className='fw-bold'>Email: </span>{match.email}</li>
+                                        <li><span className='fw-bold'>Phone Number: </span>{match.phone}</li>
                                     </ul>
                                 </div>
                             </div>

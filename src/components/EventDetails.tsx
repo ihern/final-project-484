@@ -8,6 +8,10 @@ interface PairedQRData {
   qr_code: string;
 }
 
+interface userData {
+  fname: string;
+}
+
 const EventDetails = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -26,7 +30,8 @@ const EventDetails = () => {
   const [isSuccess, setIsSuccess] = useState(false);  // for general notification
   const [canEndEvent, setCanEndEvent] = useState(false);
   const [totalRounds, setTotalRounds] = useState(0);
-  
+  const [registeredUsers, setRegisteredUsers] = useState<userData[]>([]);
+
   // sets event data
   const [eventData, setEventData] = useState({
     name: '',
@@ -91,7 +96,19 @@ const EventDetails = () => {
   };
 
   const handleEndEventButton = async () => {
-
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId);
+    if(error) {
+      console.log('Error deleting event: ', error);
+      setError(error.message);
+      setTimeout(() => {
+        setError(null);
+      }, 1500);
+    } else {
+      navigate('/admin/dashboard', { replace: true });
+    }
   };
 
   const shufflePairs = async () => {
@@ -104,6 +121,7 @@ const EventDetails = () => {
     setqrIndex(qrIndex => qrIndex + 1);
     // setqrIndex(qrIndex + 1);
     console.log('index at after', qrIndex);
+    console.log(splitQRData)
     setDisplayQR(splitQRData[qrIndex]);
   };
 
@@ -131,8 +149,8 @@ const EventDetails = () => {
 
   const handleStartEvent = async () => {
     try {
-      // fetch(`http://localhost:3000/startingEvent/${eventId}`)
-      fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
+      fetch(`http://localhost:3000/startingEvent/${eventId}`)
+      // fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
         .then(response => {
 
           if(!response.ok) {
@@ -143,10 +161,10 @@ const EventDetails = () => {
               setEventNotification(null)
             }, 3000);
 
-          throw new Error('Error fetching data from server');
+            throw new Error(response.statusText);
 
           } else {
-          return response.json();
+            return response.json();
           }
 
         })
@@ -186,8 +204,29 @@ const EventDetails = () => {
       console.log('Failed to reach server: ', error);
     }
   };
+  
+  const getRegisteredUsers = async () => {
+    const { data, error } = await supabase
+      .from('event_participants')
+      .select(`
+        user_id,
+        profile (
+          id, fname
+        )
+      `)
+      .eq('event_id', eventId)
+    if (error) {
+      console.log('Error getting registered users: ', error);
+    } else {
+
+      const allFirstNames: userData[] = data.flatMap(entry => entry.profile);
+      console.log('Names: ', allFirstNames);
+      setRegisteredUsers(allFirstNames);
+    }
+  };
 
   useEffect(() => {
+    getRegisteredUsers();
     getEvent();
   }, []);
 
@@ -242,10 +281,20 @@ const EventDetails = () => {
             <h3>General Tips Before Starting Event</h3>
             <ul>
               <li>Total number of registered users must be even! (everyone has to talk to someone)</li>
+              <li>Server will not respond if user genders are not equal (make sure even males/females participants)</li>
               <li>New QR codes must be regenerated every rotation</li>
               <li>Users must be present in the event to be paired</li>
               <li>DO NOT spam the start Start Event button (Can take up to 15 seconds to generate QR Codes)</li>
             </ul>
+            </div>
+
+            <div className='border'>
+              <h3>Registered Users</h3>
+              <ul>
+                {registeredUsers.map((user, index) => (
+                  <li key={index}>{user.fname}</li>
+                ))}
+              </ul>
             </div>
           </div>
 

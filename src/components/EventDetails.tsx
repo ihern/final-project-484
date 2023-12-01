@@ -18,11 +18,14 @@ const EventDetails = () => {
   const [error, setError] = useState<string | null>(null);  // for modal
 
   // for dashboard
-  const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
+  const [splitQRData, setSplitQRData] = useState<PairedQRData[][]>([]);
+  const [displayQR, setDisplayQR] = useState<PairedQRData[]>([]);
+  const [qrIndex, setqrIndex] = useState(0);
   const [startEventButton, setStartEventButton] = useState(false);
   const [eventNotification, setEventNotification] = useState<string | null>(null);  // general notification
   const [isSuccess, setIsSuccess] = useState(false);  // for general notification
   const [canEndEvent, setCanEndEvent] = useState(false);
+  const [totalRounds, setTotalRounds] = useState(0);
   
   // sets event data
   const [eventData, setEventData] = useState({
@@ -42,7 +45,6 @@ const EventDetails = () => {
     if (error) {
       console.log('Error getting event: ', error);
     } else {
-      console.log('Event: ', data);
       setEventData(data);
     }
   };
@@ -50,6 +52,7 @@ const EventDetails = () => {
   const handleEdit = () => {
     setIsEditing(true);
   };
+
   const handleCloseModal = () => {
     setIsEditing(false);
   };
@@ -85,29 +88,23 @@ const EventDetails = () => {
         }, 3000);
 
     }
-  }
+  };
 
   const handleEndEventButton = async () => {
 
   };
 
   const shufflePairs = async () => {
-    console.log('Shuffle button pressed !');
-    fetch(`http://localhost:3000/startingEvent/${eventId}`)
-    .then(response => {
-      if(!response.ok) {
-      throw new Error('Error fetching data from server');
-      } else {
-      return response.json();
-      }
-    })
-    .then(data => {
-      console.log(data);
-      setPairedQRData(data);
-    })
-    .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
-    });
+    console.log('Shuffling pairs...');
+    console.log('index at', qrIndex);
+    if(qrIndex + 1 > totalRounds) {
+      setEventNotification('Event has ended!');
+      return;
+    }
+    setqrIndex(qrIndex => qrIndex + 1);
+    // setqrIndex(qrIndex + 1);
+    console.log('index at after', qrIndex);
+    setDisplayQR(splitQRData[qrIndex]);
   };
 
   const handleDeleteConfirmation = () => {
@@ -134,8 +131,8 @@ const EventDetails = () => {
 
   const handleStartEvent = async () => {
     try {
-      fetch(`http://localhost:3000/startingEvent/${eventId}`)
-      // fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
+      // fetch(`http://localhost:3000/startingEvent/${eventId}`)
+      fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
         .then(response => {
 
           if(!response.ok) {
@@ -154,9 +151,24 @@ const EventDetails = () => {
 
         })
         .then(data => {
+          console.log("Data:", data);
 
-          console.log(data);
-          setPairedQRData(data);
+          const numberOfShuffles = Math.sqrt(data.length / 2);  // 3
+          const numberOfQrs = numberOfShuffles * 2;  // 6
+          const splitArrays = [];
+          const x: PairedQRData[] = data;
+
+          for (let i = 0; i < x.length; i += numberOfQrs) {
+            const chunk = x.slice(i, i + numberOfShuffles * 2);
+            splitArrays.push(chunk);
+          }
+          
+          setqrIndex(0);
+          setDisplayQR(splitArrays[qrIndex]);
+          setqrIndex(1);
+          setTotalRounds(numberOfShuffles);
+          setSplitQRData(splitArrays);
+
           setStartEventButton(true);
           setEventNotification('Event has started!');
           setIsSuccess(true);
@@ -173,7 +185,6 @@ const EventDetails = () => {
     } catch (error) {
       console.log('Failed to reach server: ', error);
     }
-
   };
 
   useEffect(() => {
@@ -249,7 +260,7 @@ const EventDetails = () => {
                 </button>
               </div>
             </div>
-            {pairedQRData.map((pair, index) => (
+            {displayQR.map((pair, index) => (
             <div key={index}>
               <p>User ID: {pair.user}</p>
               <img src={pair.qr_code} alt={`QR Code for ${pair.user}`} />

@@ -1,18 +1,35 @@
-import express from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
+import express from 'express';
 import QRCode from 'qrcode';
 import cors from 'cors';
-import { v4 as uuidv4 } from 'uuid';
 
+// database configuration
 const supabase = createClient('https://kuqqhdcrdwwemxnzxwow.supabase.co', 
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1cXFoZGNyZHd3ZW14bnp4d293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTg1NTk2NzksImV4cCI6MjAxNDEzNTY3OX0.1Fk9hPkWzRlDay0YY9bVSHtqK04VOrxVNk89NpuHjXU');
+// create express app
 const app = express();
+
+// allow cors
 app.use(cors());
+
+// port for server
 const PORT = process.env.PORT || 3000;
-const cache = {};   // temp storage for pairs
-const eventHistory = {};    // storage for previous pairs
+
+// clear cache after certain time (4 hours)
+const clearCacheInterval = 4 * 60 * 60 * 1000;
+setInterval(clearCache, clearCacheInterval);
+
+// temp storage for event history
+let cache = {};  
+
+function clearCache() {
+    console.log('Clearing cache...');
+    cache = {};
+}
 
 async function getQR(eventId, paired_sessions) {
+    // create qr codes for each user to scan to meet their match
     const qrCodes = [];
 
     for (const pair of paired_sessions) {
@@ -25,97 +42,27 @@ async function getQR(eventId, paired_sessions) {
     return qrCodes;
 }
 
-function pairParticipants(users, event_id) {
-    if (users.length % 2 !== 0) {
-        console.log('Cannot pair, uneven number of participants!');
-        return;
-    }
-    
-    const previousPairs = eventHistory[event_id] || [];
-
-    let attempts = 0;
-    let max_attempts = 100;
-    const pairs = [];
-    const temp = [...users];
-
-    console.log('RESET');
-
-    do {
-        
-        while (temp.length > 0) {
-            const randomIndex = Math.floor(Math.random() * temp.length);
-            const user1 = temp.splice(randomIndex, 1)[0];
-    
-            const user2Index = Math.floor(Math.random() * temp.length);
-            const user2 = temp.splice(user2Index, 1)[0];
-    
-            const token1 = uuidv4();
-            const token2 = uuidv4();
-
-            pairs.push([{ user: user1, token: token1 }, { user: user2, token: token2 }]);
-            console.log('a pair here', pairs)
-
-        }
-        attempts++;
-    } while (!areDiff(pairs, previousPairs) && attempts < max_attempts);
-
-    console.log('amount of attempts', attempts);
-
-    if(attempts === max_attempts) {
-        console.log('Cannot pair, too many attempts!');
-        return;
-    }
-
-    if(!eventHistory[event_id]) {
-        eventHistory[event_id] = [];
-    }
-
-    eventHistory[event_id].push(pairs);
-    cache[event_id] = pairs;
-
-    return pairs;
-}
-
 const getUsers = async (event_id) => { 
-    const { data, error } = await supabase
-        .from('event_participants')
-        .select('user_id, user_sex')
-        .eq('event_id', event_id);
-    if (error) {
-        console.error('Error fetching users:', error.message);
+    // gets users from database (user_id, sex)
+    try {
+        const { data, error } = await supabase
+            .from('event_participants')
+            .select('user_id, user_sex')
+            .eq('event_id', event_id);
+        if (error) {
+            console.error('Error fetching users:', error.message);
+            return error.message;
+        } else {
+            return data;
+        }
+    } catch (error) {
+        console.error(error.message);
         return error.message;
-    } else {
-        return data;
     }
 };
 
-
-app.get('/getPair/:eventId/:token', async (req, res) => {
-    const eventId = req.params.eventId;
-    const token = req.params.token;
-
-    // check if token is valid
-    if (!cache[eventId]) {
-        res.status(400).send('Invalid session');
-    } else {
-        const pairs = cache[eventId];
-        const findToken = pairs.find(pair => pair.some(userObj => userObj.token === token));
-        if (!findToken) {
-            res.status(400).send('Invalid token');
-        } else {
-            const user = findToken.find(userObj => userObj.token === token);
-            res.redirect(`https://super-flan-07f2d0.netlify.app/client/profile/${user.user}`);
-        }
-    }
-});
-
-app.get('/startingEvent/:eventId', async (req, res) => {
-    // obtain event id from request
-    const eventId = req.params.eventId;
-
-    //begin pairing process
-    const data = await getUsers(eventId);
-    console.log('this is the data', data)
+function matchUserGender(data) {
+    // match user to corresponding gender
     const males = [];
     const females = [];
     for (const user of data) {
@@ -128,9 +75,14 @@ app.get('/startingEvent/:eventId', async (req, res) => {
     }
 
     if(males.length !== females.length) {
-        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+        return [[],[]];
     }
 
+    return [males, females];
+}
+
+function createPairs(males, females) {
+    // match every gender to another, ensuring to meet once only
     const pairs = [];
     for(const x of males) {
         for(const y of females) {
@@ -139,7 +91,7 @@ app.get('/startingEvent/:eventId', async (req, res) => {
             }
         }
     }
-
+    // each pair will have a unique session token
     const paired_sessions = pairs.map(innerArray =>
         innerArray.map(value => { 
             const user_id = value;
@@ -147,33 +99,59 @@ app.get('/startingEvent/:eventId', async (req, res) => {
             return { user_id, token };
         })
     );
+    return paired_sessions;
+}
 
+app.get('/getPair/:eventId/:token', async (req, res) => {
+    const eventId = req.params.eventId;
+    const session_token = req.params.token;
 
-    console.log('arrays w genders:', males, females);
-    console.log('pairs:', pairs);
-    console.log('user_token:', paired_sessions);
+    // check if token is valid
+    if (!cache[eventId]) {
+        res.status(400).send('Invalid event id provided');
+    } else {    
+        // begin search for token in cache
+        const pairs = cache[eventId];
+        // search for pair containing token
 
+        for (const pair of pairs) {
+            for (const object of pair) {
+                const { user_id, token } = object;
+                if (token === session_token) {  
+                    // found pair (valid session token), redirect to profile
+                    res.redirect(`https://super-flan-07f2d0.netlify.app/client/profile/${user_id}`);
+                }
+            }
+        }
+        // if token not found, send error
+        res.status(400).send('Invalid session token provided');
+    }
+});
+
+app.get('/startingEvent/:eventId', async (req, res) => {
+    // obtain event id from request
+    const eventId = req.params.eventId;
+
+    //begin pairing process
+    const data = await getUsers(eventId);
+    
+    // match users with corresponding genders
+    const [males, females] = matchUserGender(data);
+    
+    if(!males || !females) {
+        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+    }
+
+    // create pairs
+    const paired_sessions = createPairs(males, females);
+
+    // create qr codes
     const qrCodes = await getQR(eventId, paired_sessions);
+
+    // store event matching and qr codes in cache
+    cache[eventId] = paired_sessions;
     
-    return res.status(200).send(qrCodes);
-    // const pairs = pairParticipants(data, eventId);
-    // if(!pairs) {
-    //     console.log('something happened here');
-    //     res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
-    // } else {
-    //     console.log('Users paired successfully!', pairs);
-    //     try {
-    //         // generate qr codes
-    //         const qrCodes = await getQR(eventId);
-    //         console.log('QR codes created successfully!');
-    
-    //         // send qr code to frontend
-    //         res.status(200).send(qrCodes);
-    //     } catch (error) {
-    //         console.error(error);
-    //         res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
-    //     }
-    // }    
+    return res.status(200).send(qrCodes);    
 });
 
 app.get('/', async (req, res) => {

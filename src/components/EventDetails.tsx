@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, PathRouteProps } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useEffect } from 'react';
 
@@ -19,10 +19,14 @@ const EventDetails = () => {
 
   // for dashboard
   const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
+  const [displayQR, setDisplayQR] = useState<PairedQRData[]>([]);
   const [startEventButton, setStartEventButton] = useState(false);
   const [eventNotification, setEventNotification] = useState<string | null>(null);  // general notification
   const [isSuccess, setIsSuccess] = useState(false);  // for general notification
   const [canEndEvent, setCanEndEvent] = useState(false);
+  const [round, setRound] = useState(0);
+  const [totalRounds, setTotalRounds] = useState(0);
+  
   
   // sets event data
   const [eventData, setEventData] = useState({
@@ -42,7 +46,7 @@ const EventDetails = () => {
     if (error) {
       console.log('Error getting event: ', error);
     } else {
-      console.log('Event: ', data);
+      // console.log('Event: ', data);
       setEventData(data);
     }
   };
@@ -92,22 +96,12 @@ const EventDetails = () => {
   };
 
   const shufflePairs = async () => {
-    console.log('Shuffle button pressed !');
-    fetch(`http://localhost:3000/startingEvent/${eventId}`)
-    .then(response => {
-      if(!response.ok) {
-      throw new Error('Error fetching data from server');
-      } else {
-      return response.json();
-      }
-    })
-    .then(data => {
-      console.log(data);
-      setPairedQRData(data);
-    })
-    .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
-    });
+    console.log('Inside shufflePairs');
+    if (round + 1 !== totalRounds) {
+      setRound(prevRound => prevRound + 1);
+    } else {
+      setError('EVENT OVER');
+    }
   };
 
   const handleDeleteConfirmation = () => {
@@ -132,6 +126,20 @@ const EventDetails = () => {
     }
   };
 
+  // const startDisplayQR = async () => {
+  //   console.log("INSIDE startDisplayQR");
+  //   // console.log('number of ppl in event', data.length);
+  //   const pairs = ppl.length/2;
+  //   setTotalRounds(pairs);
+  //   console.log(pairedQRData.length);
+  //   for (let i = 0; i < pairedQRData.length; i += pairs) {
+  //     const slicedData = pairedQRData.slice(i, i + pairs);
+  //     setDisplayQR(prevDisplayQR => [...prevDisplayQR, slicedData]);
+  //     console.log("This is slicedData", slicedData)
+  //   }
+  //   console.log("End of startDisplayQR");
+  // }
+
   const handleStartEvent = async () => {
     try {
       fetch(`http://localhost:3000/startingEvent/${eventId}`)
@@ -155,8 +163,22 @@ const EventDetails = () => {
         })
         .then(data => {
 
+          // console.log(data);
+          // setPairedQRData(data);
+          const numberOfPairs = Math.sqrt(data.lenght);
+          setTotalRounds(numberOfPairs);
+          const splitArrays = [];
+
+          const x: PairedQRData[] = data;
+
+          for (let i = 0; i < x.length; i += numberOfPairs) {
+            const chunk = x.slice(i, i + numberOfPairs);
+            console.log("Chunk",chunk)
+            splitArrays.push(chunk);
+          }
           console.log(data);
-          setPairedQRData(data);
+          console.log("SplitArrays:", splitArrays);
+          
           setStartEventButton(true);
           setEventNotification('Event has started!');
           setIsSuccess(true);
@@ -173,7 +195,6 @@ const EventDetails = () => {
     } catch (error) {
       console.log('Failed to reach server: ', error);
     }
-
   };
 
   useEffect(() => {

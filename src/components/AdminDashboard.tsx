@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+// import { Session } from '@supabase/supabase-js';
 
 interface EventFormData {
   id: string,
@@ -29,6 +30,17 @@ const AdminDashboard = () => {
     registration_deadline: '',
   });
 
+  const isAdmin = async () => {
+    try {
+      const {data: { session }} = await supabase.auth.getSession();
+      if(session?.user.user_metadata.role !== 'admin') {
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.log("error checking session")
+    }
+};
+
   const getEvents = async () => {
     const { data, error } = await supabase.from('events').select('name, id')
         if(error) {
@@ -44,6 +56,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId: string) => {
     const { error } = await supabase.from('profile').delete().eq('id', userId);
     if(error) {
+      console.log(error)
       setError(error.message);
       setTimeout(() => {
         setError(null);
@@ -72,6 +85,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     getEvents();
     getUsers();
+    isAdmin();
   }, []);
 
   const handleLogout = async () => {

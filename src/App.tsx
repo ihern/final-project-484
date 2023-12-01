@@ -56,11 +56,11 @@ const App = () => {
           />
           <Route 
             path="/admin/dashboard" 
-            element={<AdminDashboard />}
+            element={isAuthenticated ? <AdminDashboard/> : <Navigate to = '/' />}
           />
           <Route
             path="/event/:eventId"
-            element={<EventDetails />}
+            element={isAuthenticated ? <EventDetails/> : <Navigate to = '/' />}
           />
         </Routes>
       </BrowserRouter>

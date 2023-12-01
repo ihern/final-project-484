@@ -12,45 +12,18 @@ const PORT = process.env.PORT || 3000;
 const cache = {};   // temp storage for pairs
 const eventHistory = {};    // storage for previous pairs
 
-async function getQR(eventId) {
-    const pairs = cache[eventId];
-    const codes = [];
-    if(!pairs) {
-        console.log('Cannot pair');
-        return;
-    }
+async function getQR(eventId, paired_sessions) {
+    const qrCodes = [];
 
-    for (const pair of pairs) {
-        const qrCodes = [];
-
+    for (const pair of paired_sessions) {
         for (const userObj of pair) {
-
-            const { user, token } = userObj;
+            const { user_id, token } = userObj;
             const code = await QRCode.toDataURL(`https://four84-final-project-server.onrender.com/getPair/${eventId}/${token}`);
-            qrCodes.push({user: user, qr_code: code});
+            qrCodes.push({user: user_id, qr_code: code});
         }
-        const [firstUser, secondUser] = qrCodes;
-        codes.push({ user_id: firstUser.user, paired_qr: secondUser.qr_code });
-        codes.push({ user_id: secondUser.user, paired_qr: firstUser.qr_code });
-        // console.log('this is the event and tokens', eventId, pair.map(userObj => userObj.token));
-        // console.log('this is the cahce', cache[eventId]);
     }
-    return codes;
+    return qrCodes;
 }
-
-function areDiff(pair, prevPairs) {
-    if (prevPairs.length === 0) {
-        console.log('no previous pairs');
-      return true;
-    }
-  
-    for (const prevPair of prevPairs) {
-      // TODO
-    }
-  
-    return true; // Generated pair is different from all previous pairs
-}
-  
 
 function pairParticipants(users, event_id) {
     if (users.length % 2 !== 0) {
@@ -106,29 +79,16 @@ function pairParticipants(users, event_id) {
 const getUsers = async (event_id) => { 
     const { data, error } = await supabase
         .from('event_participants')
-        .select('user_id')
+        .select('user_id, user_sex')
         .eq('event_id', event_id);
     if (error) {
         console.error('Error fetching users:', error.message);
         return error.message;
     } else {
-        const users = data.map((obj) => obj.user_id);
-        console.log('these are the users', users);
-        return users;
+        return data;
     }
 };
 
-app.get('/shufflePairs/:eventId', async (req, res) => {
-    const eventId = req.params.eventId;
-    const data = await getUsers(eventId);
-    const pairs = pairParticipants(data, eventId);
-    if(!pairs) {
-        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
-    } else {
-        console.log('Users paired successfully!', pairs);
-        res.status(200).send({ message: 'Users paired successfully!' });
-    }
-});
 
 app.get('/getPair/:eventId/:token', async (req, res) => {
     const eventId = req.params.eventId;
@@ -152,28 +112,68 @@ app.get('/getPair/:eventId/:token', async (req, res) => {
 app.get('/startingEvent/:eventId', async (req, res) => {
     // obtain event id from request
     const eventId = req.params.eventId;
-    
+
     //begin pairing process
     const data = await getUsers(eventId);
-    const pairs = pairParticipants(data, eventId);
-    if(!pairs) {
-        console.log('something happened here');
-        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
-    } else {
-        console.log('Users paired successfully!', pairs);
-        try {
-            // generate qr codes
-            const qrCodes = await getQR(eventId);
-            console.log('QR codes created successfully!');
-    
-            // send qr code to frontend
-            res.status(200).send(qrCodes);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
+    console.log('this is the data', data)
+    const males = [];
+    const females = [];
+    for (const user of data) {
+        const { user_id, user_sex } = user;
+        if(user_sex === 'male') {
+            males.push(user_id);
+        } else {
+            females.push(user_id);
         }
     }
+
+    if(males.length !== females.length) {
+        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+    }
+
+    const pairs = [];
+    for(const x of males) {
+        for(const y of females) {
+            if(x !== y) {
+                pairs.push([x, y]);
+            }
+        }
+    }
+
+    const paired_sessions = pairs.map(innerArray =>
+        innerArray.map(value => { 
+            const user_id = value;
+            const token = uuidv4();
+            return { user_id, token };
+        })
+    );
+
+
+    console.log('arrays w genders:', males, females);
+    console.log('pairs:', pairs);
+    console.log('user_token:', paired_sessions);
+
+    const qrCodes = await getQR(eventId, paired_sessions);
     
+    return res.status(200).send(qrCodes);
+    // const pairs = pairParticipants(data, eventId);
+    // if(!pairs) {
+    //     console.log('something happened here');
+    //     res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+    // } else {
+    //     console.log('Users paired successfully!', pairs);
+    //     try {
+    //         // generate qr codes
+    //         const qrCodes = await getQR(eventId);
+    //         console.log('QR codes created successfully!');
+    
+    //         // send qr code to frontend
+    //         res.status(200).send(qrCodes);
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).send({ message: 'Error generating QR codes for users, please try again' });
+    //     }
+    // }    
 });
 
 app.get('/', async (req, res) => {

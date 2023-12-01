@@ -4,8 +4,8 @@ import { supabase } from '../services/supabase';
 import { useEffect } from 'react';
 
 interface PairedQRData {
-  user_id: string;
-  paired_qr: string;
+  user: string;
+  qr_code: string;
 }
 
 const EventDetails = () => {
@@ -251,8 +251,8 @@ const EventDetails = () => {
             </div>
             {pairedQRData.map((pair, index) => (
             <div key={index}>
-              <p>User ID: {pair.user_id}</p>
-              <img src={pair.paired_qr} alt={`QR Code for ${pair.user_id}`} />
+              <p>User ID: {pair.user}</p>
+              <img src={pair.qr_code} alt={`QR Code for ${pair.user}`} />
             </div>
           ))}
           </div>

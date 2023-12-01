@@ -7,6 +7,7 @@ import cors from 'cors';
 // database configuration
 const supabase = createClient('https://kuqqhdcrdwwemxnzxwow.supabase.co', 
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1cXFoZGNyZHd3ZW14bnp4d293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTg1NTk2NzksImV4cCI6MjAxNDEzNTY3OX0.1Fk9hPkWzRlDay0YY9bVSHtqK04VOrxVNk89NpuHjXU');
+
 // create express app
 const app = express();
 
@@ -105,6 +106,7 @@ function createPairs(males, females) {
 app.get('/getPair/:eventId/:token', async (req, res) => {
     const eventId = req.params.eventId;
     const session_token = req.params.token;
+    let found = false;
 
     // check if token is valid
     if (!cache[eventId]) {
@@ -113,24 +115,36 @@ app.get('/getPair/:eventId/:token', async (req, res) => {
         // begin search for token in cache
         const pairs = cache[eventId];
         // search for pair containing token
-
         for (const pair of pairs) {
             for (const object of pair) {
                 const { user_id, token } = object;
                 if (token === session_token) {  
+                    found = true;
                     // found pair (valid session token), redirect to profile
                     res.redirect(`https://super-flan-07f2d0.netlify.app/client/profile/${user_id}`);
                 }
             }
         }
         // if token not found, send error
-        res.status(400).send('Invalid session token provided');
+        if(!found) {
+            res.status(400).send('Invalid session token provided');
+        }
     }
 });
 
 app.get('/startingEvent/:eventId', async (req, res) => {
     // obtain event id from request
     const eventId = req.params.eventId;
+
+    // check if event id is valid
+    if (!eventId) {
+        res.status(400).send({ message: 'No event id provided' });
+    }
+
+    // check if event has already started
+    if (cache[eventId]) {
+        res.status(400).send({ message: 'Event already started' });
+    }
 
     //begin pairing process
     const data = await getUsers(eventId);

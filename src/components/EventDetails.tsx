@@ -41,6 +41,18 @@ const EventDetails = () => {
     registration_deadline: '',
   });
 
+  const isAdmin = async () => {
+    try {
+      const {data: { session }} = await supabase.auth.getSession();
+      // setSession(session)
+      if(session?.user.user_metadata.role !== 'admin') {
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.log("error checking session")
+    }
+};
+
   const handleBack = () => {
     navigate(-1);
   };
@@ -226,6 +238,7 @@ const EventDetails = () => {
   };
 
   useEffect(() => {
+    isAdmin();
     getRegisteredUsers();
     getEvent();
   }, []);

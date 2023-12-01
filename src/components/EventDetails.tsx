@@ -149,8 +149,8 @@ const EventDetails = () => {
 
   const handleStartEvent = async () => {
     try {
-      fetch(`http://localhost:3000/startingEvent/${eventId}`)
-      // fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
+      // fetch(`http://localhost:3000/startingEvent/${eventId}`)
+      fetch(`https://four84-final-project-server.onrender.com/startingEvent/${eventId}`)
         .then(response => {
 
           if(!response.ok) {

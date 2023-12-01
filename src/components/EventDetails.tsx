@@ -19,7 +19,7 @@ const EventDetails = () => {
 
   // for dashboard
   const [pairedQRData, setPairedQRData] = useState<PairedQRData[]>([]);
-  const [displayQR, setDisplayQR] = useState<PairedQRData[]>([]);
+  const [displayQR, setDisplayQR] = useState<PairedQRData[][]>([]);
   const [startEventButton, setStartEventButton] = useState(false);
   const [eventNotification, setEventNotification] = useState<string | null>(null);  // general notification
   const [isSuccess, setIsSuccess] = useState(false);  // for general notification
@@ -165,19 +165,21 @@ const EventDetails = () => {
 
           // console.log(data);
           // setPairedQRData(data);
-          const numberOfPairs = Math.sqrt(data.lenght);
+          // const numberOfPairs = Math.sqrt(data.length);
+          const numberOfPairs = 3;
           setTotalRounds(numberOfPairs);
           const splitArrays = [];
+          console.log(numberOfPairs);
 
           const x: PairedQRData[] = data;
+          console.log(x);
 
           for (let i = 0; i < x.length; i += numberOfPairs) {
             const chunk = x.slice(i, i + numberOfPairs);
-            console.log("Chunk",chunk)
             splitArrays.push(chunk);
           }
-          console.log(data);
           console.log("SplitArrays:", splitArrays);
+          setDisplayQR(splitArrays);
           
           setStartEventButton(true);
           setEventNotification('Event has started!');
@@ -270,7 +272,7 @@ const EventDetails = () => {
                 </button>
               </div>
             </div>
-            {pairedQRData.map((pair, index) => (
+            {displayQR[0].map((pair, index) => (
             <div key={index}>
               <p>User ID: {pair.user}</p>
               <img src={pair.qr_code} alt={`QR Code for ${pair.user}`} />

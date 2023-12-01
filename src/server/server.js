@@ -54,6 +54,10 @@ const getUsers = async (event_id) => {
             console.error('Error fetching users:', error.message);
             return error.message;
         } else {
+            // if data is not even, return error
+            if(data.length % 2 !== 0) {
+                return null;
+            }
             return data;
         }
     } catch (error) {
@@ -110,7 +114,7 @@ app.get('/getPair/:eventId/:token', async (req, res) => {
 
     // check if token is valid
     if (!cache[eventId]) {
-        res.status(400).send('Invalid event id provided');
+        return res.status(400).send('Invalid event id provided');
     } else {    
         // begin search for token in cache
         const pairs = cache[eventId];
@@ -127,7 +131,7 @@ app.get('/getPair/:eventId/:token', async (req, res) => {
         }
         // if token not found, send error
         if(!found) {
-            res.status(400).send('Invalid session token provided');
+            return res.status(400).send('Invalid session token provided');
         }
     }
 });
@@ -138,34 +142,49 @@ app.get('/startingEvent/:eventId', async (req, res) => {
 
     // check if event id is valid
     if (!eventId) {
-        res.status(400).send({ message: 'No event id provided' });
+        console.log('No event id provided');
+        return res.status(400).send({ message: 'No event id provided' });
     }
 
     // check if event has already started
     if (cache[eventId]) {
-        res.status(400).send({ message: 'Event already started' });
+        console.log('Event already started!')
+        return res.status(400).send({ message: 'Event already started' });
     }
 
-    //begin pairing process
-    const data = await getUsers(eventId);
-    
-    // match users with corresponding genders
-    const [males, females] = matchUserGender(data);
-    
-    if(!males || !females) {
-        res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+    try {
+        //begin pairing process
+        const data = await getUsers(eventId);
+        console.log("got users", data);
+
+        if (data === null) {
+            console.log('Cannot pair, uneven number of participants!');
+            return res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+        }
+        
+        // match users with corresponding genders
+        const [males, females] = matchUserGender(data);
+        console.log('pairs generated', males, females);
+        
+        if(!males || !females) {
+            console.log('Cannot pair, these!');
+            return res.status(400).send({ message: 'Cannot pair, uneven number of participants!' });
+        }
+
+        // create pairs
+        const paired_sessions = createPairs(males, females);
+
+        // create qr codes
+        const qrCodes = await getQR(eventId, paired_sessions);
+
+        // store event matching and qr codes in cache
+        cache[eventId] = paired_sessions;
+        
+        res.status(200).send(qrCodes);    
+    } catch(error) {
+        console.error(error.message);
+        return res.status(400).send({ message: error.message });
     }
-
-    // create pairs
-    const paired_sessions = createPairs(males, females);
-
-    // create qr codes
-    const qrCodes = await getQR(eventId, paired_sessions);
-
-    // store event matching and qr codes in cache
-    cache[eventId] = paired_sessions;
-    
-    return res.status(200).send(qrCodes);    
 });
 
 app.get('/', async (req, res) => {

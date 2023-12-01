@@ -10,6 +10,7 @@ const ClientDashboard = () => {
     const [ registered, setRegistered ] = useState<RegisteredE[]>([]);
     const [ confirmedMatch, setConfirmedMatch ] = useState<Match[]>([]);
     const [refreshData, setRefreshData] = useState(false);
+    const [sex, setSex] = useState('');
 
     interface Event {
         id: string,
@@ -109,12 +110,27 @@ const ClientDashboard = () => {
             console.log("Error checking session", error);
         }
     };
+    const getProfile = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        const uID = user?.id;
+        
+        const { data: _profile, error: selectError } = await supabase
+        .from('profile')
+        .select().eq('id', uID);
+        if (selectError){
+            console.log("Error retrieving data", selectError);
+            return;
+        }
+        const userProfile = _profile[0];
+        setSex(userProfile.sex);
+    };
     
     useEffect(() => {
         checkSession();
         getEvents();
         getRegisterFor();
         getMatches();
+        getProfile();
     }, [refreshData]);
 
     const handleLogout = async () => {
@@ -134,6 +150,7 @@ const ClientDashboard = () => {
         .insert({ 
             event_id: events[key].id, 
             user_id: userID,
+            user_sex: sex,
         });
         if (error) {
             console.log("From registering", error);

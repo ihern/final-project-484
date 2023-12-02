@@ -97,8 +97,26 @@ const ClientDashboard = () => {
         } catch (error) {
             console.log("Error getting matches", error);
         }
-    }
+    };
 
+    const cancelMatch = async (match_id: string) => {
+        try{
+            const { data: { user } } = await supabase.auth.getUser();
+            const uID = user?.id;
+
+            const {error: firstE} = await supabase.from('matches')
+            .delete().eq('user_id', uID).eq('match_id', match_id);
+            
+            if (firstE){
+                console.log("Error retrieving matches", firstE);
+                return;
+            }
+            
+        } catch (error) {
+            console.log("Error getting matches", error);
+        }
+        setRefreshData(prev => !prev);
+    };
 
     const checkSession = async () => {
         try {
@@ -110,6 +128,7 @@ const ClientDashboard = () => {
             console.log("Error checking session", error);
         }
     };
+
     const getProfile = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         const uID = user?.id;
@@ -305,6 +324,7 @@ const ClientDashboard = () => {
                                         <li><span className='fw-bold'>Phone Number: </span>{match.phone}</li>
                                     </ul>
                                 </div>
+                                <button  key={idx} className='btn btn-danger mt-2' onClick={() => cancelMatch(match.user_id)}>Delete Match</button>                                
                             </div>
                         </div>
                     </div>

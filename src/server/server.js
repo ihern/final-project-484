@@ -34,12 +34,15 @@ async function getQR(eventId, paired_sessions) {
     const qrCodes = [];
 
     for (const pair of paired_sessions) {
-        for (const userObj of pair) {
-            const { user_id, token } = userObj;
-            const code = await QRCode.toDataURL(`https://four84-final-project-server.onrender.com/getPair/${eventId}/${token}`);
-            qrCodes.push({user: user_id, qr_code: code});
-        }
+        const [user1, user2] = pair;
+
+        const code1 = await QRCode.toDataURL(`https://four84-final-project-server.onrender.com/getPair/${eventId}/${user2.token}`);
+        const code2 = await QRCode.toDataURL(`https://four84-final-project-server.onrender.com/getPair/${eventId}/${user1.token}`);
+
+        qrCodes.push({ user: user1.user_id, qr_code: code1 });
+        qrCodes.push({ user: user2.user_id, qr_code: code2 });
     }
+
     return qrCodes;
 }
 

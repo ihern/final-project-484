@@ -298,6 +298,7 @@ const EventDetails = () => {
               <li>New QR codes must be regenerated every rotation</li>
               <li>Users must be present in the event to be paired</li>
               <li>DO NOT spam the start Start Event button (Can take up to 15 seconds to generate QR Codes)</li>
+              <li>May take a while to wake up server if this is your first login</li>
             </ul>
             </div>
 

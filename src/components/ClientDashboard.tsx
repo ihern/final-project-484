@@ -297,7 +297,7 @@ const ClientDashboard = () => {
                             </div>
                         </div>
                     </div>
-                ))};
+                ))}
         </div>
         </section>
 
